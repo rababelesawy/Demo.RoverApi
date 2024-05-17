@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rover.Core\Rover.Core.csproj" />
+    <ProjectReference Include="..\Rover.Repository\Rover.Repository.csproj" />
+  </ItemGroup>
+
 </Project>
