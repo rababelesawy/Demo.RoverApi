@@ -11,8 +11,9 @@ namespace Rover.Core.Service.Contract
     public interface ITripService
     {
         Task <int> CreateTripAsync(Trip trip);
-       
+
 
     
+        
     }
 }

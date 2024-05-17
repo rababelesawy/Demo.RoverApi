@@ -77,7 +77,7 @@ namespace Demo.RoverApi.Controllers
 
         [HttpPut("update")] // PUT: /api/trip/update
         public async Task<ActionResult<string>> UpdateTrip(TripDto tripDto)
-        {
+            {
             var trip = new Trip
             {
                 Id = tripDto.Id,
@@ -96,7 +96,7 @@ namespace Demo.RoverApi.Controllers
 
 
             return ("succsessfull update");
-        }
+            }
 
 
 

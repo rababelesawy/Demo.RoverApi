@@ -16,7 +16,7 @@ namespace Rover.Service
 
     {
         private readonly IGenericRepository<Trip> _genericRepo;
-        
+       
 
         public TripService(IGenericRepository<Trip> genericrepo )
         {
