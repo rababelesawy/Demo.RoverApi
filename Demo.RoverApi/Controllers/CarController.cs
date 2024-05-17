@@ -107,19 +107,19 @@ namespace Demo.RoverApi.Controllers
 
         #region   Delete Car
 
-        [HttpDelete("{id}")]
-        public ActionResult DeleteCar(int id)
-        {
-            var car =  _genericRepository.GetAsync(id);
+        //[HttpDelete("{id}")]
+        //public ActionResult DeleteCar(int id)
+        //{
+        //    var car =  _genericRepository.GetAsync(id);
 
-            if (car == null)
-                return NotFound(new ApiResponse(404, "Car not found"));
+        //    if (car == null)
+        //        return NotFound(new ApiResponse(404, "Car not found"));
 
-            var result =  _carServices.DeleteCarAsync(car);
+        //    var result =  _carServices.DeleteCarAsync(car);
 
 
-            return ("Sucsessfully Deleted");
-        }
+        //    return ("Sucsessfully Deleted");
+        //}
         #endregion
 
 
