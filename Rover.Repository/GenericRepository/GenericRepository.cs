@@ -18,10 +18,6 @@ namespace Rover.Repository.GenericRepository
             _dbContext = dbContext;
         }
 
-
-        
-
-
         public async Task SaveTripAsync(Trip trip)
         {
             await _dbContext.Trips.AddAsync(trip);
@@ -29,12 +25,33 @@ namespace Rover.Repository.GenericRepository
         }
 
 
-        public void Delete(T entity)
-       => _dbContext.Remove(entity);
-        public void Edit(T entity)
-        => _dbContext.Update(entity);
 
-        
+        public void Delete(T entity)
+        { 
+              _dbContext.Remove(entity);
+            _dbContext.SaveChanges();
+        }
+        public async Task Edit(T entity)
+        {
+            _dbContext.Update(entity);
+            _dbContext.SaveChanges();
+        }
+
+        public async Task SaveAsync(T entity)
+        {
+            _dbContext.AddAsync(entity);
+            _dbContext.SaveChanges();
+        }
+
+        public async Task<T?> GetAsync(int id)
+        {
+            return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+           return await _dbContext.Set<T>().ToListAsync();
+        }
     }
         
     }

@@ -5,7 +5,8 @@ namespace Demo.RoverApi.Dtos
 {
     public class TripDto
     {
-
+        [Required]
+        public int Id { get; set; }
         [Required]
         public string From { get; set; }
         [Required]

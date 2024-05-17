@@ -1,5 +1,4 @@
 ﻿using Rover.Core.Entities;
-using Rover.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +7,8 @@ using System.Threading.Tasks;
 
 namespace Rover.Core.Service.Contract
 {
-    public interface ITripService
+    public  interface IDriverService
     {
-        Task <int> CreateTripAsync(Trip trip);
-       
-
-    
+        Task<int> CreateDriverAsync(Driver driver);
     }
 }

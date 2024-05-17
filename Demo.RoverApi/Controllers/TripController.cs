@@ -15,11 +15,16 @@ namespace Demo.RoverApi.Controllers
 
 
         private readonly ITripService _tripService;
-        public TripController(ITripService tripService)
+        private readonly IGenericRepository<Trip> _genericRepository;
+
+        public TripController(ITripService tripService , IGenericRepository<Trip> genericRepository)
         {
             _tripService = tripService;
+            _genericRepository = genericRepository;
         }
 
+
+        #region  Create Trip
 
         [HttpPost("creates")] //post: / api/trip
         public async Task<ActionResult<int>> CreateTrip(TripDto tripDto)
@@ -48,6 +53,70 @@ namespace Demo.RoverApi.Controllers
 
             return Ok(trip.Id);
     }
+
+        #endregion
+
+
+
+
+        #region GetAllTrips
+        [HttpGet]
+        public async Task <ActionResult<TripView>> GetTrip()
+
+        {
+         
+            var trip = await _genericRepository.GetAllAsync();
+            
+            return Ok(trip);
+        }
+
+
+        #endregion
+
+
+
+        [HttpPut("update")] // PUT: /api/trip/update
+        public async Task<ActionResult<string>> UpdateTrip(TripDto tripDto)
+        {
+            var trip = new Trip
+            {
+                Id = tripDto.Id,
+                From = tripDto.From,
+                To = tripDto.To,
+                Price = tripDto.Price,
+                Date = tripDto.Date,
+                Time = tripDto.Time,
+                SeatsAvaliable = tripDto.SeatsAvaliable,
+                CarNumber = tripDto.CarNumber,
+                Gender = tripDto.Gender,
+                DriverId = tripDto.UserId,
+            };
+
+           _genericRepository.Edit(trip);
+
+
+            return ("succsessfull update");
+        }
+
+
+
+
+
+
+
+
+
+
+
+        //[HttpPost("UpdateTrip")]
+        //public async Task <ActionResult<string>> UpdateTrip(TripDto tripDto)
+        //{
+        //    if(tripDto.Id != 0)
+        //    {
+        //        var updatetrip = await _genericRepository.Edit(Trip);
+        //    }
+
+        //}
 
     }
 }

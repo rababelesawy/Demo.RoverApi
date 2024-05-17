@@ -24,9 +24,19 @@ namespace Demo.RoverApi
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-            builder.Services.AddScoped(typeof(ITripService), typeof(TripService));
-            builder.Services.AddScoped(typeof(IGenericRepository<Trip>), typeof(GenericRepository<Trip>));
+            #region
+            //builder.Services.AddScoped(typeof(IGenericRepository<Passenger>), typeof(GenericRepository<Passenger>));
+            //builder.Services.AddScoped(typeof(IGenericRepository<Trip>), typeof(GenericRepository<Trip>));
+            //builder.Services.AddScoped(typeof(IGenericRepository<Car>), typeof(GenericRepository<Car>));
+            //builder.Services.AddScoped(typeof(IGenericRepository<Driver>), typeof(GenericRepository<Driver>));
 
+            #endregion
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            builder.Services.AddScoped(typeof(ITripService), typeof(TripService));
+            builder.Services.AddScoped(typeof(IDriverService), typeof(DriverServices));
+            builder.Services.AddScoped(typeof(ICarServices), typeof(CarServices));
+            builder.Services.AddScoped(typeof(IPassengerServices), typeof(PassengerServices));
 
             var app = builder.Build();
 

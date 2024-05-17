@@ -10,9 +10,13 @@ namespace Rover.Core.Interfaces
     public  interface IGenericRepository<T> where T : BaseEntity
     {
         Task SaveTripAsync(Trip trip);
-        void Edit(T entity);
-        void Delete(T entity);
-       
+        Task Edit(T entity);
+        void Delete(T? entity);
+       Task SaveAsync(T entity);
+
+        Task<T?> GetAsync(int id);
+        Task<IEnumerable<T>> GetAllAsync();
+
 
     }
 }

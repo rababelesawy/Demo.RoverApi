@@ -13,7 +13,7 @@ namespace Rover.Core.Entities
         public int? Age { get; set; }
        
         public long? Phone { get; set; }
-        public string? UserId { get; set; }
+        public int? UserId { get; set; }
 
         public ICollection<Passenger_Trips> PassengerTrips { get; set; }
 
