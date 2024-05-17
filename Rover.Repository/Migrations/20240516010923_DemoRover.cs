@@ -78,7 +78,8 @@ namespace Rover.Repository.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Time = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SeatsAvaliable = table.Column<int>(type: "int", nullable: false),
-                    Gender = table.Column<byte>(type: "tinyint", nullable: false),
+                    CarNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Gender = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     CarId = table.Column<int>(type: "int", nullable: false),
                     DriverId = table.Column<int>(type: "int", nullable: false)
                 },

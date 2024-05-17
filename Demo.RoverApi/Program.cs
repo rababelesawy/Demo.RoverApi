@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Rover.Core;
+using Rover.Core.Entities;
+using Rover.Core.Interfaces;
+using Rover.Core.Service.Contract;
 using Rover.Repository.Data;
-
+using Rover.Repository.GenericRepository;
+using Rover.Service;
 namespace Demo.RoverApi
 {
     public class Program
@@ -19,6 +24,10 @@ namespace Demo.RoverApi
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+            builder.Services.AddScoped(typeof(ITripService), typeof(TripService));
+            builder.Services.AddScoped(typeof(IGenericRepository<Trip>), typeof(GenericRepository<Trip>));
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

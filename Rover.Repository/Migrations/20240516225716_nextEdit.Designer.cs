@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rover.Repository.Data;
 
@@ -11,9 +12,11 @@ using Rover.Repository.Data;
 namespace Rover.Repository.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240516225716_nextEdit")]
+    partial class nextEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,6 +149,7 @@ namespace Rover.Repository.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CarId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("CarNumber")
@@ -159,6 +163,7 @@ namespace Rover.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DriverId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("From")
@@ -176,6 +181,7 @@ namespace Rover.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("StatusId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("Time")
@@ -244,15 +250,21 @@ namespace Rover.Repository.Migrations
                 {
                     b.HasOne("Rover.Core.Entities.Car", "Car")
                         .WithMany("Trips")
-                        .HasForeignKey("CarId");
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Rover.Core.Entities.Driver", "Driver")
                         .WithMany("Trips")
-                        .HasForeignKey("DriverId");
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Rover.Core.Entities.TripStatus", "Status")
                         .WithMany("Trips")
-                        .HasForeignKey("StatusId");
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Car");
 

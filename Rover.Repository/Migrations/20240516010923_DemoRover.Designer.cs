@@ -12,7 +12,7 @@ using Rover.Repository.Data;
 namespace Rover.Repository.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20240514183200_DemoRover")]
+    [Migration("20240516010923_DemoRover")]
     partial class DemoRover
     {
         /// <inheritdoc />
@@ -152,6 +152,11 @@ namespace Rover.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<string>("CarNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -159,8 +164,9 @@ namespace Rover.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<byte>("Gender")
-                        .HasColumnType("tinyint");
+                    b.Property<int>("Gender")
+                        .HasMaxLength(50)
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
