@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rover.Repository\Rover.Repository.csproj" />
+    <ProjectReference Include="..\Rover.Service\Rover.Service.csproj" />
   </ItemGroup>
 
 </Project>
