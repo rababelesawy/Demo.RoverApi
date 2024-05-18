@@ -74,7 +74,7 @@ namespace Demo.RoverApi.Controllers
 
         #endregion
 
-
+        #region  EditTrip
 
         [HttpPut("update")] // PUT: /api/trip/update
         public async Task<ActionResult<string>> UpdateTrip(TripDto tripDto)
@@ -104,14 +104,133 @@ namespace Demo.RoverApi.Controllers
 
 
 
+        #endregion
+
+
+        #region  DeleteTrip
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<string>> DeleteTrip(int id)
+        {
+            var trip = await _genericRepository.GetAsync(id);
+
+            if (trip == null)
+                return NotFound(new ApiResponse(404, "Car not found"));
+
+            var result = await _tripService.DeleteTripAsync(trip);
+
+
+            return ("Sucsessfully Deleted");
+        }
+
+
+        #endregion
+
+
+        #region   TripDetails 
+
+
+
+        [HttpGet("Details")]
+        public async Task<ActionResult<TripDto>> GetTripId(int id)
+
+        {
+
+            var trip = await _genericRepository.GetAsync(id);
+
+            return Ok(trip);
+        }
+
+        #endregion
 
 
 
 
+        #region Search Trip with Name place 
+
+
+        [HttpGet("search")]
+        public ActionResult<IEnumerable<TripDto>> SearchTrips(string searchTerm)
+        {
+            var trips = _tripService.SearchTrips(searchTerm);
+
+            if (!trips.Any())
+                return NotFound(new ApiResponse(404, "No trips found matching the search term"));
+
+            return Ok(trips);
+        }
+
+
+        #endregion
 
 
 
+        #region   //New By Days
 
-      
+
+        [HttpGet("last/7")]
+        public ActionResult<IEnumerable<Trip>> GetTripsFromLast7Days()
+        {
+            var trips = _tripService.GetTripsFromLastDays(7);
+
+            if (!trips.Any())
+                return NotFound(new ApiResponse(404, "No trips found in the last 7 days"));
+
+            return Ok(trips);
+        }
+
+        [HttpGet("last/30")]
+        public ActionResult<IEnumerable<Trip>> GetTripsFromLast30Days()
+        {
+            var trips = _tripService.GetTripsFromLastDays(30);
+
+            if (!trips.Any())
+                return NotFound(new ApiResponse(404, "No trips found in the last 30 days"));
+
+            return Ok(trips);
+        }
+
+        [HttpGet("last/90")]
+        public ActionResult<IEnumerable<Trip>> GetTripsFromLast90Days()
+        {
+            var trips = _tripService.GetTripsFromLastDays(90);
+
+            if (!trips.Any())
+                return NotFound(new ApiResponse(404, "No trips found in the last 90 days"));
+
+            return Ok(trips);
+        }
+
+        [HttpGet("last/{days}")]
+        public ActionResult<IEnumerable<Trip>> GetTripsFromLastDays(int days)
+        {
+            var trips = _tripService.GetTripsFromLastDays(days);
+
+            if (!trips.Any())
+                return NotFound(new ApiResponse(404, $"No trips found in the last {days} days"));
+
+            return Ok(trips);
+        }
+        #endregion
+
+
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

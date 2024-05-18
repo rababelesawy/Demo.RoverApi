@@ -18,5 +18,9 @@ namespace Rover.Core.Interfaces
         IQueryable<T> GetAllAsync();
 
 
+
+        IEnumerable<T> GetAll();
+
+
     }
 }
