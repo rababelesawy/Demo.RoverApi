@@ -9,24 +9,24 @@ using System.Threading.Tasks;
 
 namespace Rover.Service
 {
-    public class DriverServices : IDriverService
-    {
-        private readonly IGenericRepository<Driver> _genericRepo;
+    //public class DriverServices : IDriverService
+    //{
+    //    private readonly IGenericRepository<Driver> _genericRepo;
 
 
-        public DriverServices(IGenericRepository<Driver> genericrepo)
-        {
-            _genericRepo = genericrepo;
+    //    public DriverServices(IGenericRepository<Driver> genericrepo)
+    //    {
+    //        _genericRepo = genericrepo;
 
-        }
+    //    }
 
-        public async Task<int> CreateDriverAsync(Driver driver)
-        {
-            await _genericRepo.SaveAsync(driver);
+    //    public async Task<int> CreateDriverAsync(Driver driver)
+    //    {
+    //        await _genericRepo.SaveAsync(driver);
 
 
 
-            return (driver.Id);
-        }
-    }
+    //        return (driver.Id);
+    //    }
+    //}
 }

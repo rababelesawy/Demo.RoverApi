@@ -9,6 +9,6 @@ namespace Rover.Core.Service.Contract
 {
     public  interface IDriverService
     {
-        Task<int> CreateDriverAsync(Driver driver);
+        //Task<int> CreateDriverAsync(Driver driver);
     }
 }

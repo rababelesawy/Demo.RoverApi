@@ -11,6 +11,6 @@ namespace Rover.Core.Service.Contract
     public interface IPassengerServices
     {
 
-        Task<int> CreatePassengerAsync(Passenger passenger);
+        //Task<int> CreatePassengerAsync(Passenger passenger);
     }
 }

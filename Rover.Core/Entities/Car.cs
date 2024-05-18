@@ -15,13 +15,8 @@ namespace Rover.Core.Entities
         public string? Description { get; set; }
 
         public int? DriverId { get; set; }
-        public Driver Driver { get; set; }
+        public User Driver { get; set; }
         // Navigation properity [one ]
-
-
-
-  
-
         public ICollection<Trip> Trips { get; set;}
     }
 }

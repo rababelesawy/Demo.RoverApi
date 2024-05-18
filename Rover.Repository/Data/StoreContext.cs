@@ -22,8 +22,7 @@ namespace Rover.Repository.Data
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
-        public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Passenger> Passengers { get; set; }
+        public DbSet<User> User { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet <Passenger_Trips> Passenger_Trips { get; set; }

@@ -86,18 +86,17 @@ namespace Rover.Service
 
         #region   Search in trip
 
-        public IEnumerable<Trip> SearchTrips(string searchTerm)
+        public IEnumerable<Trip> SearchTrips(string searchTerm,int days)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-                return Enumerable.Empty<Trip>();
-
+            var dateFrom = DateTime.Now.AddDays(-days);
             var lowerCaseTerm = searchTerm.ToLower();
 
             return _genericRepo.GetAll()
                 .Where(t => (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
                          || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
                          || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
-                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)))
+                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm))&& (days==0|| t.Date >= dateFrom))
+                
                 .ToList();
         }
 

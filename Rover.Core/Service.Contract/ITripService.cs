@@ -15,12 +15,7 @@ namespace Rover.Core.Service.Contract
         Task<string> UpdateTripAsync(Trip trip);
         Task<bool> DeleteTripAsync(Trip trip);
         Task <List<TripView>> GetTripListAsync();
-
-
-
-        IEnumerable<Trip> SearchTrips(string searchTerm);
-
-
+        IEnumerable<Trip> SearchTrips(string searchTerm, int days);
 
         //New
         IEnumerable<Trip> GetTripsFromLastDays(int days);

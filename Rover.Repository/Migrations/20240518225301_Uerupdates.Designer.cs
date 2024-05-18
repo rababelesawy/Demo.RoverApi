@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rover.Repository.Data;
 
@@ -11,9 +12,11 @@ using Rover.Repository.Data;
 namespace Rover.Repository.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240518225301_Uerupdates")]
+    partial class Uerupdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,12 +129,6 @@ namespace Rover.Repository.Migrations
                     b.Property<int?>("Gender")
                         .HasMaxLength(50)
                         .HasColumnType("int");
-
-                    b.Property<long?>("Latitude")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("Longitude")
-                        .HasColumnType("bigint");
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18, 2)");

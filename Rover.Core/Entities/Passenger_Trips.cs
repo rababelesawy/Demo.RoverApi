@@ -8,11 +8,9 @@ namespace Rover.Core.Entities
 {
     public  class Passenger_Trips:BaseEntity
     {
-
         public int? PassengerId { get; set; }
 
-        public Passenger Passenger { get; set; }
-
+        public User Passenger { get; set; }
         public int? TripId { get; set; }
         public Trip Trips { get; set; }
 

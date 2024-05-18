@@ -13,36 +13,36 @@ namespace Demo.RoverApi.Controllers
     {
         private readonly IPassengerServices _passengerServices;
 
-        public PassengerController(IPassengerServices  passengerServices) {
+        public PassengerController(IPassengerServices passengerServices) {
             _passengerServices = passengerServices;
         }
 
 
-        [HttpPost("CreatePassenger")]
+        //[HttpPost("CreatePassenger")]
 
 
-        public async Task<ActionResult<int>> CreatePassenger(PassengerDto passengerDto)
-        {
+        //public async Task<ActionResult<int>> CreatePassenger(PassengerDto passengerDto)
+        //{
 
-            Passenger passenger = new Passenger()
-            {
-
-
-                Age = passengerDto.Age,
-                Phone = passengerDto.Phone,
-                Picture_Passanger = passengerDto.Picture_Passanger,
-                UserId = passengerDto.UserId,
-
-            };
-            var tripid = await _passengerServices.CreatePassengerAsync(passenger);
+        //    Passenger passenger = new Passenger()
+        //    {
 
 
-            if (tripid is -1)
-                return BadRequest(new ApiResponse(400));
+        //        Age = passengerDto.Age,
+        //        Phone = passengerDto.Phone,
+        //        Picture_Passanger = passengerDto.Picture_Passanger,
+        //        UserId = passengerDto.UserId,
+
+        //    };
+        //    var tripid = await _passengerServices.CreatePassengerAsync(passenger);
 
 
-            return Ok(passenger.Id);
-        }
+        //    if (tripid is -1)
+        //        return BadRequest(new ApiResponse(400));
 
+
+        //    return Ok(passenger.Id);
+        //}
     }
-}
+    }
+

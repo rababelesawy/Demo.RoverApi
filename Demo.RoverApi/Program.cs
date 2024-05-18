@@ -34,9 +34,9 @@ namespace Demo.RoverApi
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             builder.Services.AddScoped(typeof(ITripService), typeof(TripService));
-            builder.Services.AddScoped(typeof(IDriverService), typeof(DriverServices));
-            builder.Services.AddScoped(typeof(ICarServices), typeof(CarServices));
-            builder.Services.AddScoped(typeof(IPassengerServices), typeof(PassengerServices));
+            //builder.Services.AddScoped(typeof(IDriverService), typeof(DriverServices));
+            //builder.Services.AddScoped(typeof(ICarServices), typeof(CarServices));
+            //builder.Services.AddScoped(typeof(IPassengerServices), typeof(PassengerServices));
 
             var app = builder.Build();
 

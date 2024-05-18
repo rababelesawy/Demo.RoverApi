@@ -8,8 +8,6 @@ namespace Rover.Core.Entities
 {
     public  class TripStatus:BaseEntity
     {
-
-
         public string Name { get; set; }
         public ICollection<Trip> Trips { get; set;}
 

@@ -16,9 +16,6 @@ namespace Rover.Core.Interfaces
 
         Task<T?> GetAsync(int id);
         IQueryable<T> GetAllAsync();
-
-
-
         IEnumerable<T> GetAll();
 
 
