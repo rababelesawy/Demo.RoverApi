@@ -1,7 +1,7 @@
 ﻿using Rover.Core.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace Demo.RoverApi.Dtos
+namespace Rover.Core.Dtos
 {
     public class TripDto
     {

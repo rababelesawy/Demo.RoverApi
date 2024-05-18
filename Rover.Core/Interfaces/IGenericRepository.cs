@@ -11,11 +11,11 @@ namespace Rover.Core.Interfaces
     {
         Task SaveTripAsync(Trip trip);
         Task Edit(T entity);
-        void Delete(T? entity);
+        void Delete(T entity);
        Task SaveAsync(T entity);
 
         Task<T?> GetAsync(int id);
-        Task<IEnumerable<T>> GetAllAsync();
+        IQueryable<T> GetAllAsync();
 
 
     }

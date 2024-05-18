@@ -47,21 +47,12 @@ namespace Rover.Service
         public async Task<bool> DeleteCarAsync(Car car)
         {
 
-
+           car.DeleteDate = DateTime.Now;
             _carRepo.Delete(car);
 
             return true;
         }
 
-        //    public async Task<bool> DeleteCarById(int id)
-        //    {
-        //        var car = _carRepo.GetAsync(id);
-        //        if (car == null)
-        //            return false; // Car not found
-
-        //        _carRepo.Delete(car);
-        //        return true; // Successful deletion
-        //    }
-        //}
+  
     }
 }

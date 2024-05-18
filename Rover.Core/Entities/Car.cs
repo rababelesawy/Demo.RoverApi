@@ -18,6 +18,10 @@ namespace Rover.Core.Entities
         public Driver Driver { get; set; }
         // Navigation properity [one ]
 
+
+
+  
+
         public ICollection<Trip> Trips { get; set;}
     }
 }

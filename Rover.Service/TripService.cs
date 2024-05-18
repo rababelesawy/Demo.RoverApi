@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Rover.Repository.GenericRepository;
 using Rover.Repository.Data;
 using Rover.Core;
+using Rover.Core.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace Rover.Service
 {
@@ -35,7 +37,36 @@ namespace Rover.Service
             return (trip.Id);
         }
 
-       
+        public async Task<List<TripView>> GetTripListAsync()
+        {
+
+            
+        return await _genericRepo.GetAllAsync().Where(x=>x.DeleteDate == null).Select(x=>new TripView(){
+                From = x.From,
+                To = x.To,
+                Price= x.Price,
+                Date = x.Date,
+                Time = x.Time,
+                
+            }).ToListAsync();
+
+            
+        }
+
+
+
+
+
+
+
+        public async Task<string> UpdateTripAsync(Trip trip)
+        {
+            await _genericRepo.Edit(trip);
+
+            return ("Sucssessfull update");
+        }
+
+     
     }
 }
  

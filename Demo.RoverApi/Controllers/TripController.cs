@@ -1,4 +1,4 @@
-﻿using Demo.RoverApi.Dtos;
+﻿using Rover.Core.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rover.Core.Entities;
@@ -7,6 +7,7 @@ using ApiRover.Errors;
 using System.Reflection;
 using Rover.Core.Interfaces;
 using Rover.Repository.GenericRepository;
+using Rover.Service;
 
 namespace Demo.RoverApi.Controllers
 {
@@ -65,7 +66,7 @@ namespace Demo.RoverApi.Controllers
 
         {
          
-            var trip = await _genericRepository.GetAllAsync();
+            var trip = await _tripService.GetTripListAsync();
             
             return Ok(trip);
         }
@@ -91,8 +92,11 @@ namespace Demo.RoverApi.Controllers
                 Gender = tripDto.Gender,
                 DriverId = tripDto.UserId,
             };
+            var result = await _tripService.UpdateTripAsync(trip);
 
-           _genericRepository.Edit(trip);
+            if (result is null)
+            
+                return ("Faild Update");
 
 
             return ("succsessfull update");
@@ -108,15 +112,6 @@ namespace Demo.RoverApi.Controllers
 
 
 
-        //[HttpPost("UpdateTrip")]
-        //public async Task <ActionResult<string>> UpdateTrip(TripDto tripDto)
-        //{
-        //    if(tripDto.Id != 0)
-        //    {
-        //        var updatetrip = await _genericRepository.Edit(Trip);
-        //    }
-
-        //}
-
+      
     }
 }

@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Rover.Core.Entities
 {
-    public  class TripStatus
+    public  class TripStatus:BaseEntity
     {
 
-        public int Id { get; set; }
+
         public string Name { get; set; }
         public ICollection<Trip> Trips { get; set;}
+
 
     }
 }

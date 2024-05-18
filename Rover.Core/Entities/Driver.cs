@@ -16,5 +16,6 @@ namespace Rover.Core.Entities
         public int? UserId { get; set; }
         public ICollection<Trip> Trips { get; set;}
 
+
     }
 }

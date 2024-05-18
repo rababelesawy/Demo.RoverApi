@@ -28,7 +28,7 @@ namespace Rover.Repository.GenericRepository
 
         public void Delete(T entity)
         { 
-              _dbContext.Remove(entity);
+            _dbContext.Update(entity);
             _dbContext.SaveChanges();
         }
         public async Task Edit(T entity)
@@ -45,12 +45,12 @@ namespace Rover.Repository.GenericRepository
 
         public async Task<T?> GetAsync(int id)
         {
-            return await _dbContext.Set<T>().FindAsync(id);
+            return await _dbContext.Set<T>().FirstOrDefaultAsync(i=>i.Id == id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public IQueryable<T> GetAllAsync()
         {
-           return await _dbContext.Set<T>().ToListAsync();
+           return  _dbContext.Set<T>();
         }
     }
         

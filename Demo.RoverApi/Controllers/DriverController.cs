@@ -1,5 +1,5 @@
 ﻿using ApiRover.Errors;
-using Demo.RoverApi.Dtos;
+using Rover.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Rover.Core.Entities;
 using Rover.Core.Service.Contract;

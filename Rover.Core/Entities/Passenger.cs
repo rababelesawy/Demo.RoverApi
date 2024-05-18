@@ -17,6 +17,5 @@ namespace Rover.Core.Entities
 
         public ICollection<Passenger_Trips> PassengerTrips { get; set; }
 
-        
     }
 }

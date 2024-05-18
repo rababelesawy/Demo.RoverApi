@@ -31,8 +31,6 @@ namespace Rover.Core.Entities
         public TripStatus? Status { get; set; }
 
 
-        public DateTime? UpdateDate { get; set; }
-        public DateTime? DeleteDate { get; set; }
 
 
 
