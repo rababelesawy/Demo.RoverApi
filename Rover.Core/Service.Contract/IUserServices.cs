@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace Rover.Core.Service.Contract
 {
-    public  interface IDriverService
+    public  interface IUserServices
     {
-        Task<int> CreateDriverAsync(Driver driver);
+
+        Task<string> CreateUserAsync(User user);
+
+        Task SaveUserAsync(User user);
     }
 }

@@ -15,7 +15,9 @@ namespace Rover.Repository.Data.Config
         {
             builder.Property(p=>p.Picture_Car).HasMaxLength(100);
             builder.Property(p => p.Picture_License).HasMaxLength(100);
+            builder.Property(p=>p.Driver_License_Picture).HasMaxLength(100);
             builder.Property(p => p.License_Car).HasMaxLength(100);
+            builder.Property(p => p.CarNumber).HasMaxLength(50);
             builder.Property(p => p.Model).HasMaxLength(30);
             builder.Property(p => p.Description).HasMaxLength(100);
 

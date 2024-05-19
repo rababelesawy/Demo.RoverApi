@@ -24,7 +24,7 @@ namespace Rover.Core.Dtos
         [Required]
         public int Gender { get; set; }  // male =0 , female = 1, other = 2
 
-        public int UserId { get; set; }
+        public string DriverId { get; set; }
         
        
 

@@ -37,7 +37,7 @@ namespace Demo.RoverApi.Controllers
                 License_Car = carDto.License_Car,
                 Model = carDto.Model,
                 Description = carDto.Description,
-                DriverId = carDto.UserId,
+                DriverId = carDto.UserId
 
 
 
@@ -73,7 +73,7 @@ namespace Demo.RoverApi.Controllers
              Model = carDto.Model,
              Description = carDto.Description,
              License_Car= carDto.License_Car,
-             DriverId = carDto.UserId,
+             DriverId = carDto.UserId
 
             };
 

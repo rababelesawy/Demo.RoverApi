@@ -40,7 +40,7 @@ namespace Demo.RoverApi.Controllers
                 SeatsAvaliable = tripDto.SeatsAvaliable,
                 CarNumber = tripDto.CarNumber,
                 Gender = tripDto.Gender,
-                DriverId = tripDto.UserId,
+                DriverId = tripDto.DriverId,
 
 
 
@@ -90,7 +90,7 @@ namespace Demo.RoverApi.Controllers
                 SeatsAvaliable = tripDto.SeatsAvaliable,
                 CarNumber = tripDto.CarNumber,
                 Gender = tripDto.Gender,
-                DriverId = tripDto.UserId,
+                DriverId = tripDto.DriverId,
             };
             var result = await _tripService.UpdateTripAsync(trip);
 
