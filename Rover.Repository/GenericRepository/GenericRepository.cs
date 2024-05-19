@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Rover.Core.Dtos;
 using Rover.Core.Entities;
 using Rover.Core.Interfaces;
 using Rover.Repository.Data;
@@ -13,6 +14,8 @@ namespace Rover.Repository.GenericRepository
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         private readonly StoreContext _dbContext;
+
+        public object User => throw new NotImplementedException();
 
         public GenericRepository(StoreContext dbContext)
         {
@@ -53,13 +56,36 @@ namespace Rover.Repository.GenericRepository
         {
             return _dbContext.Set<T>();
         }
-
-
-        public IEnumerable<T> GetAll()
+        public Task SaveChangesAsync()
         {
-            return _dbContext.Set<T>().AsNoTracking().ToList();
+            throw new NotImplementedException();
         }
 
-    }
+        public Task<bool> RegisterUserAsync(UserRegistrationDto registrationDto)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Task<UserDetailsDto> GetUserDetailsAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+     
+
+        public async Task AddAsync(T entity)
+        {
+            await _dbContext.AddAsync(entity);
+        }
+
+        public async Task<T?> GetByIdAsync(int id)
+        {
+            return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public IQueryable<T> GetAll()
+        {
+            return _dbContext.Set<T>();
+        }
+    }
 }
+    
