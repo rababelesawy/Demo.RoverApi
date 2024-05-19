@@ -11,19 +11,18 @@ namespace Rover.Core.Service.Contract
 {
     public interface ITripService
     {
-        Task <int> CreateTripAsync(Trip trip);
+        Task<int> CreateTripAsync(Trip trip);
         Task<string> UpdateTripAsync(Trip trip);
         Task<bool> DeleteTripAsync(Trip trip);
-        Task <List<TripView>> GetTripListAsync();
-
-
+        Task<List<TripView>> GetTripListAsync();
+        IEnumerable<Trip> SearchTripsDays(string searchTerm, int days);
 
         IEnumerable<Trip> SearchTrips(string searchTerm);
 
-
-
         //New
         IEnumerable<Trip> GetTripsFromLastDays(int days);
+
+
 
     }
 }

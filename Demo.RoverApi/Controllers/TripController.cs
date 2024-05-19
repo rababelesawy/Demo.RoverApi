@@ -144,10 +144,7 @@ namespace Demo.RoverApi.Controllers
         #endregion
 
 
-
-
         #region Search Trip with Name place 
-
 
         [HttpGet("search")]
         public ActionResult<IEnumerable<TripDto>> SearchTrips(string searchTerm)
@@ -160,12 +157,24 @@ namespace Demo.RoverApi.Controllers
             return Ok(trips);
         }
 
+        #endregion
+
+        #region Search Trip by string and days both 
+
+        [HttpGet("search")]
+        public ActionResult<IEnumerable<TripDto>> SearchTripsDays(string searchTerm, int days)
+        {
+            var trips = _tripService.SearchTripsDays(searchTerm, days);
+
+            if (!trips.Any())
+                return NotFound(new ApiResponse(404, "No trips found matching the search term"));
+
+            return Ok(trips);
+        }
 
         #endregion
 
-
-
-        #region   //New By Days
+        #region   Filtration New By Days
 
 
         [HttpGet("last/7")]
@@ -213,6 +222,11 @@ namespace Demo.RoverApi.Controllers
         }
         #endregion
 
+        #region Trip Status 
+
+
+
+        #endregion
 
     }
 }

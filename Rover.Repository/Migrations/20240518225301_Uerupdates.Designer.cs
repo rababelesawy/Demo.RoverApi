@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rover.Repository.Data;
 
@@ -11,9 +12,11 @@ using Rover.Repository.Data;
 namespace Rover.Repository.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240518225301_Uerupdates")]
+    partial class Uerupdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,10 +33,6 @@ namespace Rover.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CarNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
@@ -41,12 +40,8 @@ namespace Rover.Repository.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("DriverId")
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Driver_License_Picture")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int?>("DriverId")
+                        .HasColumnType("int");
 
                     b.Property<long?>("License_Car")
                         .HasMaxLength(100)
@@ -85,12 +80,10 @@ namespace Rover.Repository.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PassengerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int?>("PassengerId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("TripId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -102,7 +95,7 @@ namespace Rover.Repository.Migrations
 
                     b.HasIndex("TripId");
 
-                    b.ToTable("User_Trips");
+                    b.ToTable("Passenger_Trips");
                 });
 
             modelBuilder.Entity("Rover.Core.Entities.Trip", b =>
@@ -126,14 +119,8 @@ namespace Rover.Repository.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DriverId")
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("Expected_Arrivale")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Expected_Arrivale")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("DriverId")
+                        .HasColumnType("int");
 
                     b.Property<string>("From")
                         .HasMaxLength(50)
@@ -142,12 +129,6 @@ namespace Rover.Repository.Migrations
                     b.Property<int?>("Gender")
                         .HasMaxLength(50)
                         .HasColumnType("int");
-
-                    b.Property<long?>("Latitude")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("Longitude")
-                        .HasColumnType("bigint");
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18, 2)");
@@ -204,9 +185,11 @@ namespace Rover.Repository.Migrations
 
             modelBuilder.Entity("Rover.Core.Entities.User", b =>
                 {
-                    b.Property<string>("User_Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("Age")
                         .HasColumnType("int");
@@ -237,19 +220,27 @@ namespace Rover.Repository.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Picture_License")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Picture_User")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int?>("Type")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("User_Picture")
+                    b.Property<string>("UserId")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("User_Id");
+                    b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Rover.Core.Entities.Car", b =>
@@ -265,15 +256,11 @@ namespace Rover.Repository.Migrations
                 {
                     b.HasOne("Rover.Core.Entities.User", "Passenger")
                         .WithMany("PassengerTrips")
-                        .HasForeignKey("PassengerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PassengerId");
 
                     b.HasOne("Rover.Core.Entities.Trip", "Trips")
-                        .WithMany("Passenger_Trips")
-                        .HasForeignKey("TripId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("PassengerTrips")
+                        .HasForeignKey("TripId");
 
                     b.Navigation("Passenger");
 
@@ -308,7 +295,7 @@ namespace Rover.Repository.Migrations
 
             modelBuilder.Entity("Rover.Core.Entities.Trip", b =>
                 {
-                    b.Navigation("Passenger_Trips");
+                    b.Navigation("PassengerTrips");
                 });
 
             modelBuilder.Entity("Rover.Core.Entities.TripStatus", b =>

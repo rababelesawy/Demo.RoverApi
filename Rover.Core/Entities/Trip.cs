@@ -10,8 +10,6 @@ namespace Rover.Core.Entities
  
     public class Trip : BaseEntity
     {
-
-
         public string? From { get; set; }
         public string? To { get; set; }
         public long? Latitude { get; set; }
@@ -39,13 +37,6 @@ namespace Rover.Core.Entities
         public ICollection<Passenger_Trips> Passenger_Trips { get; set; }
 
      
-
-
-
-
-
-
-
 
 
     }
