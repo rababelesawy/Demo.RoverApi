@@ -18,6 +18,8 @@ namespace Rover.Core.Dtos
         [Required]
         public DateTime Time { get; set; }
         [Required]
+        public DateTime? Expected_Arrivale { get; set; }
+        [Required]
         public int SeatsAvaliable { get; set; }
         [Required]
         public string CarNumber { get; set; }
