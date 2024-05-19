@@ -84,9 +84,27 @@ namespace Rover.Service
 
         #endregion
 
-        #region   Search in trip
+        #region   Search in trip by string
+        public IEnumerable<Trip> SearchTrips(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+                return Enumerable.Empty<Trip>();
 
-        public IEnumerable<Trip> SearchTrips(string searchTerm,int days)
+            var lowerCaseTerm = searchTerm.ToLower();
+
+            return _genericRepo.GetAll()
+                .Where(t => (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
+                         || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
+                         || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
+                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)))
+                .ToList();
+        }
+
+        #endregion
+
+        #region   Search by string and day both
+
+        public IEnumerable<Trip> SearchTripsDays(string searchTerm, int days)
         {
             var dateFrom = DateTime.Now.AddDays(-days);
             var lowerCaseTerm = searchTerm.ToLower();
@@ -95,14 +113,12 @@ namespace Rover.Service
                 .Where(t => (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
                          || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
                          || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
-                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm))&& (days==0|| t.Date >= dateFrom))
-                
+                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)) && (days == 0 || t.Date >= dateFrom))
+
                 .ToList();
         }
 
-
         #endregion
-
 
         #region  GetTripsFromLastDays
         public IEnumerable<Trip> GetTripsFromLastDays(int days)
@@ -112,7 +128,6 @@ namespace Rover.Service
                 .Where(t => t.Date >= dateFrom)
                 .ToList();
         }
-
 
         #endregion
 
