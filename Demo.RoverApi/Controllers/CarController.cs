@@ -23,7 +23,7 @@ namespace Demo.RoverApi.Controllers
 
         #region   Create Car
 
-       
+
         [HttpPost("CreateCar")]
 
 
@@ -37,7 +37,8 @@ namespace Demo.RoverApi.Controllers
                 License_Car = carDto.License_Car,
                 Model = carDto.Model,
                 Description = carDto.Description,
-                DriverId = carDto.UserId
+                DriverId = carDto.UserId,
+                Driver_License_Picture = carDto.Driver_License_Picture,
 
 
 
@@ -62,27 +63,28 @@ namespace Demo.RoverApi.Controllers
         #region  EditCar
 
         [HttpPut("update")] // PUT: /api/car/update
-        public async Task<ActionResult<string>> UpdateCar( CarDto carDto)
+        public async Task<ActionResult<string>> UpdateCar(CarDto carDto)
         {
-           
+
             var Car = new Car
             {
-             Id = carDto.Id,
-             Picture_License = carDto.Picture_License,
-             Picture_Car= carDto.Picture_Car,
-             Model = carDto.Model,
-             Description = carDto.Description,
-             License_Car= carDto.License_Car,
-             DriverId = carDto.UserId
+                Id = carDto.Id,
+                Picture_License = carDto.Picture_License,
+                Picture_Car = carDto.Picture_Car,
+                Model = carDto.Model,
+                Description = carDto.Description,
+                License_Car = carDto.License_Car,
+                DriverId = carDto.UserId,
+                Driver_License_Picture = carDto.Driver_License_Picture,
 
             };
 
-           var result = await _carServices.UpdateCarAsync(Car);
+            var result = await _carServices.UpdateCarAsync(Car);
             if (result is null)
             {
                 return ("Faild Update");
-             
-               
+
+
             }
 
 
@@ -103,7 +105,7 @@ namespace Demo.RoverApi.Controllers
         #region   Delete Car
 
         [HttpDelete("{id}")]
-        public async Task <ActionResult<string>> DeleteCar(int id)
+        public async Task<ActionResult<string>> DeleteCar(int id)
         {
             var car = await _genericRepository.GetAsync(id);
 

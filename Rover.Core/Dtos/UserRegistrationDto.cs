@@ -9,7 +9,7 @@ namespace Rover.Core.Dtos
 {
     public class UserRegistrationDto
     {
-        [Required]
+      
         public string UserId { get; set; }
         [Required]
         public string Picture_User { get; set; }

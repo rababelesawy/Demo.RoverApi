@@ -18,7 +18,7 @@ namespace Demo.RoverApi.Controllers
         private readonly ITripService _tripService;
         private readonly IGenericRepository<Trip> _genericRepository;
 
-        public TripController(ITripService tripService , IGenericRepository<Trip> genericRepository)
+        public TripController(ITripService tripService, IGenericRepository<Trip> genericRepository)
         {
             _tripService = tripService;
             _genericRepository = genericRepository;
@@ -44,8 +44,8 @@ namespace Demo.RoverApi.Controllers
 
 
 
-        };
-        var tripid = await _tripService.CreateTripAsync(trip);
+            };
+            var tripid = await _tripService.CreateTripAsync(trip);
 
 
             if (tripid is -1)
@@ -53,7 +53,7 @@ namespace Demo.RoverApi.Controllers
 
 
             return Ok(trip.Id);
-    }
+        }
 
         #endregion
 
@@ -62,12 +62,12 @@ namespace Demo.RoverApi.Controllers
 
         #region GetAllTrips
         [HttpGet]
-        public async Task <ActionResult<TripView>> GetTrip()
+        public async Task<ActionResult<TripView>> GetTrip()
 
         {
-         
+
             var trip = await _tripService.GetTripListAsync();
-            
+
             return Ok(trip);
         }
 
@@ -78,7 +78,7 @@ namespace Demo.RoverApi.Controllers
 
         [HttpPut("update")] // PUT: /api/trip/update
         public async Task<ActionResult<string>> UpdateTrip(TripDto tripDto)
-            {
+        {
             var trip = new Trip
             {
                 Id = tripDto.Id,
@@ -95,12 +95,12 @@ namespace Demo.RoverApi.Controllers
             var result = await _tripService.UpdateTripAsync(trip);
 
             if (result is null)
-            
+
                 return ("Faild Update");
 
 
             return ("succsessfull update");
-            }
+        }
 
 
 
@@ -132,51 +132,61 @@ namespace Demo.RoverApi.Controllers
 
 
         [HttpGet("Details")]
-        public async Task<ActionResult<TripDto>> GetTripId(int id)
-
+        public async Task<ActionResult<DetailsTrips>> GetTripDetails(int id)
         {
-
             var trip = await _genericRepository.GetAsync(id);
 
-            return Ok(trip);
+            if (trip == null)
+            {
+                return NotFound(); // Return 404 if trip with the given ID is not found
+            }
+
+            var tripDetails = new DetailsTrips
+            {
+                From = trip.From,
+                To = trip.To,
+                Price = trip.Price,
+                Date = trip.Date,
+                Time = trip.Time,
+                Expected_Arrivale = trip.Expected_Arrivale,
+                SeatsAvaliable = trip.SeatsAvaliable,
+                CarNumber = trip.CarNumber,
+                Gender = trip.Gender
+            };
+
+            return Ok(tripDetails);
         }
 
         #endregion
 
+        #region   Search word
 
-        #region Search Trip with Name place 
-
-        [HttpGet("search")]
-        public ActionResult<IEnumerable<TripDto>> SearchTrips(string searchTerm)
+        [HttpGet("searchbystring")]
+        public async Task<ActionResult<List<TripView>>> SearchTripsAsync(string searchTerm)
         {
-            var trips = _tripService.SearchTrips(searchTerm);
-
-            if (!trips.Any())
-                return NotFound(new ApiResponse(404, "No trips found matching the search term"));
-
+            var trips = await _tripService.SearchTripsAsync(searchTerm);
             return Ok(trips);
         }
 
         #endregion
 
-        #region Search Trip by string and days both 
 
-        [HttpGet("search")]
-        public ActionResult<IEnumerable<TripDto>> SearchTripsDays(string searchTerm, int days)
+        #region String place and days 
+
+        [HttpGet("searchs")]
+        public async Task<ActionResult<List<TripView>>> SearchTripsAsync(string searchTerm, int days)
         {
-            var trips = _tripService.SearchTripsDays(searchTerm, days);
-
-            if (!trips.Any())
-                return NotFound(new ApiResponse(404, "No trips found matching the search term"));
-
+            var trips = await _tripService.SearchTripsDaysAsync(searchTerm, days);
             return Ok(trips);
         }
 
+
         #endregion
 
-        #region   Filtration New By Days
 
 
+
+        #region  Filtration by LastDays
         [HttpGet("last/7")]
         public ActionResult<IEnumerable<Trip>> GetTripsFromLast7Days()
         {
@@ -222,14 +232,18 @@ namespace Demo.RoverApi.Controllers
         }
         #endregion
 
-        #region Trip Status 
 
 
+   
 
-        #endregion
 
+    
     }
+
 }
+
+
+
 
 
 

@@ -18,5 +18,9 @@ namespace Rover.Core.Dtos
         public string Description { get; set; }
 
         public string UserId { get; set; }
+        [Required]
+        public string Driver_License_Picture { get; set; }
+
+        
     }
 }

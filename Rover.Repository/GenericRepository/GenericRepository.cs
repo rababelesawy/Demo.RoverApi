@@ -15,7 +15,7 @@ namespace Rover.Repository.GenericRepository
     {
         private readonly StoreContext _dbContext;
 
-        public object User => throw new NotImplementedException();
+
 
         public GenericRepository(StoreContext dbContext)
         {
@@ -56,21 +56,8 @@ namespace Rover.Repository.GenericRepository
         {
             return _dbContext.Set<T>();
         }
-        public Task SaveChangesAsync()
-        {
-            throw new NotImplementedException();
-        }
+    
 
-        public Task<bool> RegisterUserAsync(UserRegistrationDto registrationDto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UserDetailsDto> GetUserDetailsAsync(string userId)
-        {
-            throw new NotImplementedException();
-        }
-     
 
         public async Task AddAsync(T entity)
         {

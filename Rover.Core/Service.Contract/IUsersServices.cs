@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace Rover.Core.Service.Contract
 {
-    public  interface IUserServices
+    public  interface IUsersServices
     {
+        Task RegisterUser(User user);
+        Task<User> GetUserById(string userId);
+        Task<User> ChangeUserType(string userId, int newType);
 
-        Task<string> CreateUserAsync(User user);
 
-        Task SaveUserAsync(User user);
     }
 }

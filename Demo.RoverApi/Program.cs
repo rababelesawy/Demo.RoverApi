@@ -33,10 +33,11 @@ namespace Demo.RoverApi
             #endregion
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+           
             builder.Services.AddScoped(typeof(ITripService), typeof(TripService));
-        
+          
             builder.Services.AddScoped(typeof(ICarServices), typeof(CarServices));
-       
+            //builder.Services.AddScoped(typeof(IUsersServices), typeof(UsersServices));
 
             var app = builder.Build();
 
