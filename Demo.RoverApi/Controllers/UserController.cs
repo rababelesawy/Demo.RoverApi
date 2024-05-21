@@ -18,33 +18,92 @@ namespace Demo.RoverApi.Controllers
         }
 
 
+        #region Insert Data
 
-        [HttpPost("Register")]
-
-        public async Task Register(UserDto userDto)
-
+        [HttpPost]
+        public async Task<IActionResult> InsertUserData( UserDto userData)
         {
-            User user = new User()
+            var result = await _usersServices.InsertUserData(userData);
+            if (result)
             {
-                First_Name = userDto.First_Name,
-                Last_Name= userDto.Last_Name,
-                Email = userDto.Email,
-                Password= userDto.Password,
-                Phone= userDto.Phone,
-                Gender= userDto.Gender,
-                Type= userDto.Type,
-                User_Picture= userDto.User_Picture,
-                User_Id = userDto.UserId,
+                return Ok("User data inserted successfully.");
+            }
+            else
+            {
+                return BadRequest("Failed to insert user data.");
+            }
+        }
 
+        #endregion
+        #region GetUser user By ID
 
+        [HttpGet("{userId}")]
+        public async Task<ActionResult> GetUserData(string userId)
+        {
+            var userData = await _usersServices.GetUserData(userId);
+            if (userData != null)
+            {
+                return Ok(userData);
+            }
+            else
+            {
+                return NotFound("User data not found.");
+            }
+        }
+        #endregion
 
+        #region Update Type of User
+        [HttpPost("{userId}/UpdateType")]
+        public async Task<IActionResult> UpdateUserType(string userId, int userType)
+        {
+            var result = await _usersServices.UpdateUserType(userId, userType);
+            if (result)
+            {
+                return Ok("User type updated successfully.");
+            }
+            else
+            {
+                return NotFound("User not found.");
+            }
+        }
+        #endregion
 
-            };
+        #region Delete User Data 
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var result = await _usersServices.DeleteUser(userId);
+            if (result)
+            {
+                return Ok("User deleted successfully.");
+            }
+            else
+            {
+                return NotFound("User not found.");
+            }
+        }
 
-           await _usersServices.RegisterUser(user);
+        #endregion
+        #region data
 
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUserData( UserDto userData)
+        {
+            var result = await _usersServices.UpdateUserData(userData);
+            if (result)
+            {
+                return Ok("User data updated successfully.");
+            }
+            else
+            {
+                return NotFound("User not found.");
+            }
 
 
         }
+
+        #endregion
+
     }
 }
+ 

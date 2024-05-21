@@ -73,6 +73,11 @@ namespace Rover.Repository.GenericRepository
         {
             return _dbContext.Set<T>();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
     

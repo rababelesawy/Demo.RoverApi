@@ -12,6 +12,8 @@ using Rover.Core;
 using Rover.Core.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.ConstrainedExecution;
+using Rover.Repository.Migrations;
+using System.Runtime.CompilerServices;
 
 namespace Rover.Service
 {
@@ -19,12 +21,15 @@ namespace Rover.Service
 
     {
         private readonly IGenericRepository<Trip> _genericRepo;
+        
+        private readonly IUsersServices _usersServices;
+        private readonly StoreContext _storeContext;
 
-
-        public TripService(IGenericRepository<Trip> genericrepo)
+        public TripService(IGenericRepository<Trip> genericrepo, IUsersServices usersServices , StoreContext storeContext)
         {
             _genericRepo = genericrepo;
-
+            _usersServices = usersServices;
+            _storeContext = storeContext;
         }
 
 
@@ -243,11 +248,166 @@ namespace Rover.Service
             };
         }
 
-            #endregion
+        #endregion
 
 
+
+        #region Status trip
+
+
+        //public async Task<string> UpdateTripStatus(string userId, int tripId, int StatusId)
+        //{
+        //    var trip = await _genericRepo.GetAsync(tripId);
+        //    if (trip == null)
+        //    {
+        //        throw new Exception("Trip not found");
+        //    }
+
+
+        //    if (userId != null && trip.StatusId != null && trip.SeatsAvaliable == 0)
+        //    {
+        //        trip.StatusId = 4; // Completed
+        //    }
+
+        //    if (userId != null && trip.StatusId != null && trip.SeatsAvaliable > 0)
+
+        //        if (trip.StatusId == 2)
+
+        //         trip.SeatsAvaliable -= 1;
+
+        //      if (trip.SeatsAvaliable == 0)
+
+        //        trip.StatusId = 4;
+        //      if(tripId == 3)
+
+        //        trip.SeatsAvaliable += 1;
+
+        //      if (tripId == 1)
+        //        trip.StatusId = 1;
+
+
+
+        //   await _genericRepo.SaveChangesAsync();
+
+
+        //    return "Update Tripstatues";
+        //}
+
+
+
+
+
+
+        #endregion
+
+
+
+        public async Task<string> UpdateTripStatus(string userId, int tripId, int statusId)
+        {
+            var trip = await _genericRepo.GetAsync(tripId);
+            var user = await _usersServices.GetUserData(userId);
+            if (trip == null)
+            {
+                throw new Exception("Trip not found");
+            }
+
+            if (userId != null)
+            {
+                switch (statusId)
+                {
+                    case 1: // Available
+                        trip.StatusId = 1;
+                        break;
+
+                    case 2: // Accepted
+
+                        if (user.Type == 1) {
+
+                            if (trip.SeatsAvaliable > 0)
+                            {
+                                trip.SeatsAvaliable -= 1;
+                                if (trip.SeatsAvaliable == 0)
+                                {
+                                    trip.StatusId = 4; // Completed
+                                }
+                            }
+                            var passenger_trip = new Passenger_Trips()
+                            {
+                                TripId = tripId,
+                                PassengerId = userId,
+
+                            };
+
+                            _storeContext.Add<Passenger_Trips>(passenger_trip);
+                            await _storeContext.SaveChangesAsync();
+
+                            
+
+                        }
+                        else
+                        {
+                            return "You Dont Have Permission";
+                        }
+
+
+                        break;
+
+                    case 3: // Cancelled
+                        if (userId == trip.DriverId)
+                        {
+                            trip.StatusId = 3; // cancle 
+                        }
+                        else {
+
+                            trip.SeatsAvaliable += 1;
+                            if (trip.StatusId == 4)
+                            {
+                                trip.StatusId = 1; // Available
+                            }
+                          var result=  _storeContext.Set<Passenger_Trips>().FirstOrDefaultAsync(x => x.PassengerId == userId && x.TripId == tripId);
+                             _storeContext.Remove(result);
+                            await _storeContext.SaveChangesAsync();
+                        }
+
+
+                       
+                        
+                        break;
+
+                    case 4: // Completed
+                        trip.StatusId = 4;
+                        break;
+
+                    default:
+                        throw new Exception("Invalid status ID");
+                }
+
+                await _genericRepo.SaveChangesAsync();
+                return "Trip status updated successfully.";
+            }
+            else
+            {
+                throw new Exception("Invalid user ID");
+            }
 
         }
-}
 
- 
+
+
+
+
+        public async Task AutoCompleteTripsAsync()
+        {
+            var tripsToComplete = await _genericRepo.GetAllAsync()
+                .Where(t => t.Expected_Arrivale < DateTime.UtcNow && t.StatusId == 1) // Available status
+                .ToListAsync();
+
+            foreach (var trip in tripsToComplete)
+            {
+                trip.StatusId = 4; // Completed
+            }
+
+            await _genericRepo.SaveChangesAsync();
+        }
+    }
+}

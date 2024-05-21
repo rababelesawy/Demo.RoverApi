@@ -1,4 +1,5 @@
-﻿using Rover.Core.Entities;
+﻿using Rover.Core.Dtos;
+using Rover.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,11 @@ namespace Rover.Core.Service.Contract
 {
     public  interface IUsersServices
     {
-        Task RegisterUser(User user);
-        Task<User> GetUserById(string userId);
-        Task<User> ChangeUserType(string userId, int newType);
+        Task<bool> InsertUserData(UserDto userData);
+        Task<bool> UpdateUserType(string userId, int userType);
+        Task<bool> DeleteUser(string userId);
+        Task<bool> UpdateUserData(UserDto userData);
+        Task<UserDto> GetUserData(string userId);
 
 
     }

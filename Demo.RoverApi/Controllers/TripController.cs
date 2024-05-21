@@ -234,13 +234,31 @@ namespace Demo.RoverApi.Controllers
 
 
 
-   
 
+        [HttpPost("update-status")]
+        public async Task<IActionResult> UpdateTripStatus([FromQuery] string userId, [FromQuery] int tripId, [FromQuery] int statusId)
+        {
+            if (tripId <= 0 || statusId <= 0 || string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest("Invalid parameters.");
+            }
 
-    
+            try
+            {
+                var result = await _tripService.UpdateTripStatus(userId, tripId, statusId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 
+
 }
+
+
 
 
 

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Rover.Core;
 using Rover.Core.Entities;
 using Rover.Core.Interfaces;
@@ -6,12 +6,17 @@ using Rover.Core.Service.Contract;
 using Rover.Repository.Data;
 using Rover.Repository.GenericRepository;
 using Rover.Service;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Rover.Service;
+
 namespace Demo.RoverApi
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -32,12 +37,14 @@ namespace Demo.RoverApi
 
             #endregion
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUsersServices, UsersServices>(); // إضافة هذا السطر لتسجيل خدمة IUsersServices
 
-           
             builder.Services.AddScoped(typeof(ITripService), typeof(TripService));
-          
+
             builder.Services.AddScoped(typeof(ICarServices), typeof(CarServices));
-            //builder.Services.AddScoped(typeof(IUsersServices), typeof(UsersServices));
+
+            //builder.Services.AddControllers();
+
 
             var app = builder.Build();
 
@@ -56,6 +63,8 @@ namespace Demo.RoverApi
             app.MapControllers();
 
             app.Run();
+
+
         }
     }
 }
