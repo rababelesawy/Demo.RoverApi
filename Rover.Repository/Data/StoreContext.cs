@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rover.Core.Entities;
 
+using Rover.Repository.GenericRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +22,12 @@ namespace Rover.Repository.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+     
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Car> Cars { get; set; }
-        public DbSet <Passenger_Trips> User_Trips { get; set; }
+        public DbSet <Passenger_Trips> Passenger_Trips { get; set; }
         public DbSet<TripStatus> Trip_Status { get; set; }
 
 

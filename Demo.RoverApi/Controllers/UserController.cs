@@ -35,6 +35,8 @@ namespace Demo.RoverApi.Controllers
         }
 
         #endregion
+
+
         #region GetUser user By ID
 
         [HttpGet("{userId}")]
@@ -84,6 +86,7 @@ namespace Demo.RoverApi.Controllers
         }
 
         #endregion
+
         #region data
 
         [HttpPut("UpdateUser")]

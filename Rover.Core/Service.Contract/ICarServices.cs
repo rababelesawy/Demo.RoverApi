@@ -13,6 +13,6 @@ namespace Rover.Core.Service.Contract
         Task<int> CreateCarAsync(Car car);
         Task <string> UpdateCarAsync(Car car);
         Task<bool> DeleteCarAsync(Car car);
-        //Task<bool> DeleteCarById(int id);
+        Task<Car> GetCarByIdAsync(int id);
     }
 }

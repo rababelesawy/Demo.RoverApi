@@ -15,6 +15,7 @@ namespace Rover.Core.Service.Contract
         Task<bool> DeleteUser(string userId);
         Task<bool> UpdateUserData(UserDto userData);
         Task<UserDto> GetUserData(string userId);
+        Task <User> GetUserId(string userId);
 
 
     }

@@ -12,10 +12,10 @@ namespace Rover.Core.Entities
         public string? Picture_Car { get; set; }
         public long? License_Car { get; set; }
         public string? CarNumber { get; set; }
-        public string? Driver_License_Picture { get; set; }
+        public string? Driver_License_Picture { get; set;}
         public  string? Model { get; set; }
         public string? Description { get; set; }
-
+        public DateTime? Birth_Driver { get; set;}
         public string? DriverId { get; set; }
         public User? Driver { get; set; }
 

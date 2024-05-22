@@ -12,7 +12,7 @@ using Rover.Core;
 using Rover.Core.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.ConstrainedExecution;
-using Rover.Repository.Migrations;
+
 using System.Runtime.CompilerServices;
 
 namespace Rover.Service
@@ -117,32 +117,10 @@ namespace Rover.Service
 
 
         #endregion
-        #region by string place and days 
-        public async Task<List<TripView>> SearchTripsDaysAsync(string searchTerm, int days)
-        {
-            var dateFrom = DateTime.Now.AddDays(-days);
-            var lowerCaseTerm = searchTerm.ToLower();
 
-            var trips = await _genericRepo.GetAllAsync()
-                .Where(t => (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
-                         || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
-                         || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
-                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm))
-                         && (days == 0 || t.Date >= dateFrom))
-                .Select(t => new TripView
-                {
-                    From = t.From,
-                    To = t.To,
-                    Price = t.Price,
-                    Date = t.Date,
-                    Time = t.Time
-                })
-                .ToListAsync();
 
-            return trips;
-        }
 
-        #endregion
+
 
 
 
@@ -150,6 +128,8 @@ namespace Rover.Service
         public IEnumerable<Trip> GetTripsFromLastDays(int days)
         {
             var dateFrom = DateTime.Now.AddDays(-days);
+
+            // Retrieve and filter trips based on the DateTime value
             return _genericRepo.GetAll()
                 .Where(t => t.Date >= dateFrom)
                 .ToList();
@@ -159,73 +139,14 @@ namespace Rover.Service
 
 
 
-        #endregion
 
-
-        #region status
-
-
-        //public async Task<bool> AcceptTripAsync(int tripId)
-        //{
-        //    var trip = await _genericRepo.GetAsync(tripId);
-        //    if (trip == null)
-        //        return false;
-
-        //    if (trip.SeatsAvaliable > 0)
-        //    {
-        //        trip.SeatsAvaliable--;
-        //        await _genericRepo.Edit(trip);
-        //    }
-
-        //    return true;
-        //}
-
-        //public async Task<bool> CancelTripAsync(int tripId, int userType)
-        //{
-        //    var trip = await _genericRepo.GetAsync(tripId);
-        //    if (trip == null)
-        //        return false;
-
-        //    if (userType == 2) // Driver
-        //    {
-        //        trip. = "cancelled";
-        //        await _genericRepo.Edit(trip);
-        //    }
-        //    else if (userType == 1) // Passenger
-        //    {
-        //        if (trip.Status == "completed")
-        //        {
-        //            trip.Status = "available";
-        //            trip.SeatsAvaliable++;
-        //            await _genericRepo.Edit(trip);
-        //        }
-        //    }
-
-        //    return true;
-        //}
-
-        //public async Task<bool> RemoveTripIfNoBookingsAsync(int tripId)
-        //{
-        //    var trip = await _genericRepo.GetAsync(tripId);
-        //    if (trip == null)
-        //        return false;
-
-        //    if (trip.Bookings.Count == 0 && trip.Expected_Arrivale < DateTime.Now)
-        //    {
-        //         _genericRepo.Delete(trip);
-
-        //    }
-
-        //    return false;
-        //}
-        #endregion
+            #endregion
 
 
 
+            #region TripDetails
 
-        #region
-
-        public async Task<DetailsTrips> GetTripDetailsAsync(int id)
+            public async Task<DetailsTrips> GetTripDetailsAsync(int id)
         {
             var trip = await _genericRepo.GetAsync(id);
 
@@ -252,56 +173,11 @@ namespace Rover.Service
 
 
 
-        #region Status trip
+        
+     
 
 
-        //public async Task<string> UpdateTripStatus(string userId, int tripId, int StatusId)
-        //{
-        //    var trip = await _genericRepo.GetAsync(tripId);
-        //    if (trip == null)
-        //    {
-        //        throw new Exception("Trip not found");
-        //    }
-
-
-        //    if (userId != null && trip.StatusId != null && trip.SeatsAvaliable == 0)
-        //    {
-        //        trip.StatusId = 4; // Completed
-        //    }
-
-        //    if (userId != null && trip.StatusId != null && trip.SeatsAvaliable > 0)
-
-        //        if (trip.StatusId == 2)
-
-        //         trip.SeatsAvaliable -= 1;
-
-        //      if (trip.SeatsAvaliable == 0)
-
-        //        trip.StatusId = 4;
-        //      if(tripId == 3)
-
-        //        trip.SeatsAvaliable += 1;
-
-        //      if (tripId == 1)
-        //        trip.StatusId = 1;
-
-
-
-        //   await _genericRepo.SaveChangesAsync();
-
-
-        //    return "Update Tripstatues";
-        //}
-
-
-
-
-
-
-        #endregion
-
-
-
+        #region   Status trip
         public async Task<string> UpdateTripStatus(string userId, int tripId, int statusId)
         {
             var trip = await _genericRepo.GetAsync(tripId);
@@ -321,7 +197,7 @@ namespace Rover.Service
 
                     case 2: // Accepted
 
-                        if (user.Type == 1) {
+                        if (user.Type == 1) { // passenger
 
                             if (trip.SeatsAvaliable > 0)
                             {
@@ -346,27 +222,29 @@ namespace Rover.Service
                         }
                         else
                         {
-                            return "You Dont Have Permission";
+                            return "You Dont Have Permission";  // Driver
                         }
 
 
                         break;
 
                     case 3: // Cancelled
-                        if (userId == trip.DriverId)
+                        if (userId == trip.DriverId &&  user.Type != 1)
                         {
                             trip.StatusId = 3; // cancle 
                         }
                         else {
 
                             trip.SeatsAvaliable += 1;
-                            if (trip.StatusId == 4)
+                            if (trip.SeatsAvaliable > 0 && trip.StatusId == 4)
                             {
+                             
+
+                                var result = _storeContext.Set<Passenger_Trips>().FirstOrDefaultAsync(x => x.PassengerId == userId && x.TripId == tripId);
+                                _storeContext.Remove(result);
+                                await _storeContext.SaveChangesAsync();
                                 trip.StatusId = 1; // Available
                             }
-                          var result=  _storeContext.Set<Passenger_Trips>().FirstOrDefaultAsync(x => x.PassengerId == userId && x.TripId == tripId);
-                             _storeContext.Remove(result);
-                            await _storeContext.SaveChangesAsync();
                         }
 
 
@@ -396,18 +274,89 @@ namespace Rover.Service
 
 
 
-        public async Task AutoCompleteTripsAsync()
+     
+
+        #endregion
+
+
+
+        #region  AvaliableTrip
+        public async Task<List<TripView>> SearchAvailableTripsAsync(string searchTerm)
         {
-            var tripsToComplete = await _genericRepo.GetAllAsync()
-                .Where(t => t.Expected_Arrivale < DateTime.UtcNow && t.StatusId == 1) // Available status
+            var now = DateTime.Now;
+            var lowerCaseTerm = searchTerm.ToLower();
+
+            var availableTrips = await _genericRepo.GetAllAsync()
+                .Where(t => t.DeleteDate == null
+                            && t.Expected_Arrivale > now
+                            && t.StatusId == 1 // Status 1 for Available
+                            && t.StatusId != 3 // Status 3 for Cancelled
+                            && t.StatusId != 4 // Status 4 for Completed
+                            && (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
+                            || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
+                            || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
+                            || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)))
+                .Select(t => new TripView
+                {
+                    Id = t.Id,
+                    From = t.From,
+                    To = t.To,
+                    Price = t.Price,
+                    Date = t.Date,
+                    Time = t.Time
+                })
                 .ToListAsync();
 
-            foreach (var trip in tripsToComplete)
-            {
-                trip.StatusId = 4; // Completed
-            }
-
-            await _genericRepo.SaveChangesAsync();
+            return availableTrips;
         }
+
+
+        #endregion
+
+        #region Search by string place and days in History "My tip"
+        public async Task<List<TripView>> SearchHistoricalTripsAsync(string userId, string searchTerm, int days)
+        {
+            var dateFrom = DateTime.Now.AddDays(-days);
+         
+            var lowerCaseTerm = searchTerm.ToLower();
+
+            var userTrips = await _genericRepo.GetAllAsync()
+                .Where(t => t.DeleteDate == null
+                            && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId)))
+                .ToListAsync();
+
+            var historicalTrips = userTrips
+                .Where(t => t.Expected_Arrivale <= dateFrom
+                            && t.DeleteDate == null)
+                .Where(t => (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
+                         || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
+                         || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
+                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)))
+                .Select(t => new TripView
+                {
+                    From = t.From,
+                    To = t.To,
+                    Price = t.Price,
+                    Date = t.Date,
+                    Time = t.Time // التحقق من أن الخاصية Time من نوع TimeOnly
+                })
+                .ToList();
+
+            return historicalTrips;
+        }
+
+     
+
+        #endregion
+
+
+
+
+
+
+
+
+
     }
 }
+

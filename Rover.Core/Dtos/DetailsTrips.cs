@@ -17,11 +17,9 @@ namespace Rover.Core.Dtos
         public decimal? Price { get; set; }
 
         public DateTime? Date { get; set; }
-
         public DateTime? Time { get; set; }
-
         public DateTime? Expected_Arrivale { get; set; }
-        
+
         public int? SeatsAvaliable { get; set; }
         
         public string? CarNumber { get; set; }

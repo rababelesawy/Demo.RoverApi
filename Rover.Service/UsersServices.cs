@@ -4,6 +4,7 @@ using Rover.Core.Entities;
 using Rover.Core.Service.Contract;
 using Rover.Repository.Data;
 using System;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -66,7 +67,7 @@ namespace Rover.Service
         {
             try
             {
-              
+
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.User_Id == userId);
                 if (user != null)
                 {
@@ -169,9 +170,37 @@ namespace Rover.Service
             }
 
         }
+
+
         #endregion
+        
+        #region  GetUserID
 
-  
+        public async Task<User> GetUserId(string userId)
+        {
+            try
+            {
+                if (userId == null)
+                {
+                    throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
+                }
 
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.User_Id == userId);
+
+                if (user == null)
+                {
+                    throw new ArgumentException("User not found");
+                }
+
+                return (user);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion
     }
 }
+    

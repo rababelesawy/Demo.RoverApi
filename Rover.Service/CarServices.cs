@@ -13,22 +13,34 @@ namespace Rover.Service
     public class CarServices : ICarServices
     {
         private readonly IGenericRepository<Car> _carRepo;
+        private readonly IUsersServices _usersServices;
 
-        public CarServices(IGenericRepository<Car> CarRepo)
+        public CarServices(IGenericRepository<Car> CarRepo , IUsersServices usersServices)
         {
             _carRepo = CarRepo;
+           _usersServices = usersServices;
         }
 
 
         //Create Car
         public async Task<int> CreateCarAsync(Car car)
         {
+
+          
             await _carRepo.SaveAsync(car);
 
 
 
             return (car.Id);
         }
+
+
+        // Get car by id 
+        public async Task<Car> GetCarByIdAsync(int id)
+        {
+            return await _carRepo.GetByIdAsync(id);
+        }
+
 
 
         // Update car
@@ -52,6 +64,10 @@ namespace Rover.Service
 
             return true;
         }
+
+
+
+
 
   
     }

@@ -5,7 +5,7 @@ namespace Rover.Core.Dtos
 {
     public class TripDto
     {
-        [Required]
+      
         public int Id { get; set; }
         [Required]
         public string From { get; set; }
@@ -14,9 +14,9 @@ namespace Rover.Core.Dtos
         [Required]
         public decimal Price { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
         [Required]
-        public DateTime Time { get; set; }
+        public DateTime? Time { get; set; }
         [Required]
         public DateTime? Expected_Arrivale { get; set; }
         [Required]
@@ -25,6 +25,7 @@ namespace Rover.Core.Dtos
         public string CarNumber { get; set; }
         [Required]
         public int Gender { get; set; }  // male =0 , female = 1, other = 2
+        public int? statusId { get; set; } = 1;
 
         public string DriverId { get; set; }
         

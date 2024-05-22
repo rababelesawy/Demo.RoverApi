@@ -12,8 +12,8 @@ using Rover.Repository.Data;
 namespace Rover.Repository.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20240517013105_UserId")]
-    partial class UserId
+    [Migration("20240522043355_Intial")]
+    partial class Intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,88 +33,44 @@ namespace Rover.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime?>("Birth_Driver")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("DriverId")
-                        .HasColumnType("int");
+                    b.Property<string>("CarNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DriverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Driver_License_Picture")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("License_Car")
-                        .HasMaxLength(100)
                         .HasColumnType("bigint");
 
                     b.Property<string>("Model")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Picture_Car")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Picture_License")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId");
 
                     b.ToTable("Cars");
-                });
-
-            modelBuilder.Entity("Rover.Core.Entities.Driver", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("Phone")
-                        .HasMaxLength(11)
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Picture_License")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Drivers");
-                });
-
-            modelBuilder.Entity("Rover.Core.Entities.Passenger", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("Phone")
-                        .HasMaxLength(11)
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Picture_Passanger")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Passengers");
                 });
 
             modelBuilder.Entity("Rover.Core.Entities.Passenger_Trips", b =>
@@ -125,11 +81,18 @@ namespace Rover.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("PassengerId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PassengerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("TripId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -152,8 +115,7 @@ namespace Rover.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CarNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
@@ -161,19 +123,26 @@ namespace Rover.Repository.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DriverId")
-                        .HasColumnType("int");
+                    b.Property<string>("DriverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<TimeSpan?>("Expected_Arrivale")
+                        .HasColumnType("time");
 
                     b.Property<string>("From")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Gender")
-                        .HasMaxLength(50)
                         .HasColumnType("int");
 
+                    b.Property<long?>("Latitude")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("Longitude")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("SeatsAvaliable")
                         .HasColumnType("int");
@@ -181,12 +150,11 @@ namespace Rover.Repository.Migrations
                     b.Property<int?>("StatusId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Time")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan?>("Time")
+                        .HasColumnType("time");
 
                     b.Property<string>("To")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
@@ -210,18 +178,67 @@ namespace Rover.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Trip_Status");
                 });
 
+            modelBuilder.Entity("Rover.Core.Entities.User", b =>
+                {
+                    b.Property<string>("User_Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("Birth_User")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("First_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Last_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User_Picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("User_Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Rover.Core.Entities.Car", b =>
                 {
-                    b.HasOne("Rover.Core.Entities.Driver", "Driver")
+                    b.HasOne("Rover.Core.Entities.User", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId");
 
@@ -230,12 +247,14 @@ namespace Rover.Repository.Migrations
 
             modelBuilder.Entity("Rover.Core.Entities.Passenger_Trips", b =>
                 {
-                    b.HasOne("Rover.Core.Entities.Passenger", "Passenger")
+                    b.HasOne("Rover.Core.Entities.User", "Passenger")
                         .WithMany("PassengerTrips")
-                        .HasForeignKey("PassengerId");
+                        .HasForeignKey("PassengerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Rover.Core.Entities.Trip", "Trips")
-                        .WithMany("PassengerTrips")
+                        .WithMany("Passenger_Trips")
                         .HasForeignKey("TripId");
 
                     b.Navigation("Passenger");
@@ -249,7 +268,7 @@ namespace Rover.Repository.Migrations
                         .WithMany("Trips")
                         .HasForeignKey("CarId");
 
-                    b.HasOne("Rover.Core.Entities.Driver", "Driver")
+                    b.HasOne("Rover.Core.Entities.User", "Driver")
                         .WithMany("Trips")
                         .HasForeignKey("DriverId");
 
@@ -269,23 +288,20 @@ namespace Rover.Repository.Migrations
                     b.Navigation("Trips");
                 });
 
-            modelBuilder.Entity("Rover.Core.Entities.Driver", b =>
-                {
-                    b.Navigation("Trips");
-                });
-
-            modelBuilder.Entity("Rover.Core.Entities.Passenger", b =>
-                {
-                    b.Navigation("PassengerTrips");
-                });
-
             modelBuilder.Entity("Rover.Core.Entities.Trip", b =>
                 {
-                    b.Navigation("PassengerTrips");
+                    b.Navigation("Passenger_Trips");
                 });
 
             modelBuilder.Entity("Rover.Core.Entities.TripStatus", b =>
                 {
+                    b.Navigation("Trips");
+                });
+
+            modelBuilder.Entity("Rover.Core.Entities.User", b =>
+                {
+                    b.Navigation("PassengerTrips");
+
                     b.Navigation("Trips");
                 });
 #pragma warning restore 612, 618

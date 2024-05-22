@@ -19,7 +19,7 @@ namespace Rover.Core.Entities
         public string? Password { get; set; }
         public int? Gender { get; set; }
         public int? Type { get; set; }  // 1=passenger 2=driver
-        public int? Age { get; set; }
+        public DateTime? Birth_User { get; set; }
         public DateTime? UpdateDate { get; set; }
         public DateTime? DeleteDate { get; set; }
 

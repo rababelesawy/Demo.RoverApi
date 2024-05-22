@@ -17,42 +17,69 @@ namespace Demo.RoverApi.Controllers
 
         private readonly ITripService _tripService;
         private readonly IGenericRepository<Trip> _genericRepository;
+        private readonly IUsersServices _usersServices;
 
-        public TripController(ITripService tripService, IGenericRepository<Trip> genericRepository)
+        public TripController(ITripService tripService, IGenericRepository<Trip> genericRepository , IUsersServices usersServices)
         {
             _tripService = tripService;
             _genericRepository = genericRepository;
+            _usersServices = usersServices;
         }
 
 
         #region  Create Trip
 
         [HttpPost("creates")] //post: / api/trip
-        public async Task<ActionResult<int>> CreateTrip(TripDto tripDto)
+        public async Task <ActionResult<int>> CreateTrip(TripDto tripDto , string UserId)
+
         {
-            Trip trip = new Trip()
+            var User = await _usersServices.GetUserId(UserId); // Driver
+
+            if (UserId == User.User_Id && User.Type == 1)
             {
-                To = tripDto.From,
-                From = tripDto.To,
-                Price = tripDto.Price,
-                Date = tripDto.Date,
-                Time = tripDto.Time,
-                SeatsAvaliable = tripDto.SeatsAvaliable,
-                CarNumber = tripDto.CarNumber,
-                Gender = tripDto.Gender,
-                DriverId = tripDto.DriverId,
+
+                return NotFound(new ApiResponse(404, "User dont have Permission"));
+
+            }
+
+            if (User.Type != 1)
+            {
+
+                Trip trip = new Trip()
+                {
+
+                    To = tripDto.From,
+                    From = tripDto.To,
+                    Price = tripDto.Price,
+                    Date = tripDto.Date,
+                    Time = tripDto.Time,
+                    SeatsAvaliable = tripDto.SeatsAvaliable,
+                    CarNumber = tripDto.CarNumber,
+                    Gender = tripDto.Gender,
+                    DriverId = tripDto.DriverId,
+                    Expected_Arrivale = tripDto.Expected_Arrivale,
+                    StatusId = 1,
 
 
 
-            };
-            var tripid = await _tripService.CreateTripAsync(trip);
+                };
+
+                var tripid = await _tripService.CreateTripAsync(trip);
 
 
-            if (tripid is -1)
-                return BadRequest(new ApiResponse(400));
+                if (tripid is -1)
+                    return BadRequest(new ApiResponse(400));
 
 
-            return Ok(trip.Id);
+                return Ok(trip.Id);
+            }
+
+           
+
+
+            return Ok();
+                
+
         }
 
         #endregion
@@ -171,78 +198,117 @@ namespace Demo.RoverApi.Controllers
         #endregion
 
 
-        #region String place and days 
 
-        [HttpGet("searchs")]
-        public async Task<ActionResult<List<TripView>>> SearchTripsAsync(string searchTerm, int days)
-        {
-            var trips = await _tripService.SearchTripsDaysAsync(searchTerm, days);
-            return Ok(trips);
-        }
-
-
-        #endregion
 
 
 
 
         #region  Filtration by LastDays
         [HttpGet("last/7")]
-        public ActionResult<IEnumerable<Trip>> GetTripsFromLast7Days()
+        public ActionResult<IEnumerable<TripDto>> GetTripsFromLast7Days()
         {
             var trips = _tripService.GetTripsFromLastDays(7);
 
             if (!trips.Any())
                 return NotFound(new ApiResponse(404, "No trips found in the last 7 days"));
 
-            return Ok(trips);
+            var tripDtos = trips.Select(t => new TripDto
+            {
+                Id = t.Id,
+                From = t.From,
+                To = t.To,
+                Price = (decimal)t.Price,
+                Date = t.Date,
+                Time = t.Time,
+                CarNumber = t.CarNumber,
+                DriverId = t.DriverId,
+
+            });
+
+            return Ok(tripDtos);
         }
 
         [HttpGet("last/30")]
-        public ActionResult<IEnumerable<Trip>> GetTripsFromLast30Days()
+        public ActionResult<IEnumerable<TripDto>> GetTripsFromLast30Days()
         {
             var trips = _tripService.GetTripsFromLastDays(30);
 
             if (!trips.Any())
                 return NotFound(new ApiResponse(404, "No trips found in the last 30 days"));
 
-            return Ok(trips);
+            var tripDtos = trips.Select(t => new TripDto
+            {
+                Id = t.Id,
+                From = t.From,
+                To = t.To,
+                Price = (decimal)t.Price,
+                Date = t.Date,
+                Time = t.Time,
+                CarNumber = t.CarNumber,
+                DriverId = t.DriverId,
+            });
+
+            return Ok(tripDtos);
         }
 
+
         [HttpGet("last/90")]
-        public ActionResult<IEnumerable<Trip>> GetTripsFromLast90Days()
+        public ActionResult<IEnumerable<TripDto>> GetTripsFromLast90Days()
         {
             var trips = _tripService.GetTripsFromLastDays(90);
 
             if (!trips.Any())
                 return NotFound(new ApiResponse(404, "No trips found in the last 90 days"));
 
-            return Ok(trips);
+            var tripDtos = trips.Select(t => new TripDto
+            {
+                Id = t.Id,
+                From = t.From,
+                To = t.To,
+                Price = (decimal)t.Price,
+                Date = t.Date,
+                Time = t.Time,
+                CarNumber = t.CarNumber,
+                DriverId = t.DriverId,
+            });
+
+            return Ok(tripDtos);
         }
 
         [HttpGet("last/{days}")]
-        public ActionResult<IEnumerable<Trip>> GetTripsFromLastDays(int days)
+        public ActionResult<IEnumerable<TripDto>> GetTripsFromLastDays(int days)
         {
             var trips = _tripService.GetTripsFromLastDays(days);
 
             if (!trips.Any())
                 return NotFound(new ApiResponse(404, $"No trips found in the last {days} days"));
 
-            return Ok(trips);
+            var tripDtos = trips.Select(t => new TripDto
+            {
+                Id = t.Id,
+                From = t.From,
+                To = t.To,
+                Price = (decimal)t.Price,
+                Date = t.Date,
+                Time = t.Time,
+                CarNumber = t.CarNumber,
+                DriverId = t.DriverId,
+            });
+
+            return Ok(tripDtos);
         }
+
+
         #endregion
 
 
+        #region status
 
+     
 
-        [HttpPost("update-status")]
-        public async Task<IActionResult> UpdateTripStatus([FromQuery] string userId, [FromQuery] int tripId, [FromQuery] int statusId)
+        [HttpPost("UpdateTripStatus")]
+        public async Task<IActionResult> UpdateTripStatus(string userId, int tripId, int statusId)
         {
-            if (tripId <= 0 || statusId <= 0 || string.IsNullOrWhiteSpace(userId))
-            {
-                return BadRequest("Invalid parameters.");
-            }
-
             try
             {
                 var result = await _tripService.UpdateTripStatus(userId, tripId, statusId);
@@ -250,13 +316,73 @@ namespace Demo.RoverApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        #endregion
+
+
+
+
+
+
+
+
+
+        #region  Search Available Trips
+      
+
+            [HttpGet("Avaliable")]
+            public async Task<IActionResult> SearchAvailableTripsAsync(string searchTerm)
+            {
+                try
+                {
+                    var trips = await _tripService.SearchAvailableTripsAsync(searchTerm);
+                    return Ok(trips);
+                }
+                catch (Exception ex)
+                {
+                    // Handle exception and return appropriate error response
+                    return StatusCode(500, new ApiResponse(500, ex.Message));
+                }
+            }
+        
+        #endregion
+
+
+        #region Search Historical Trips
+
+
+        [HttpGet("historical")]
+        public async Task<IActionResult> SearchHistoricalTrips(string userId, string searchTerm, int days)
+        {
+            try
+            {
+                var trips = await _tripService.SearchHistoricalTripsAsync(userId, searchTerm, days);
+                var tripViews = trips.Select(t => new TripView
+                {
+
+                    From = t.From,
+                    To = t.To,
+                    Price = t.Price,
+                    Date = t.Date,
+                    Time = t.Time
+                }).ToList();
+                return Ok(new { success = true, message = "Historical trips retrieved successfully.", data = tripViews });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Failed to retrieve historical trips: {ex.Message}" });
             }
         }
     }
 
-
+    #endregion
 }
+
+
+
 
 
 
