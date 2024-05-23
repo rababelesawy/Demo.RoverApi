@@ -56,17 +56,12 @@ namespace Demo.RoverApi.Controllers
 
         #region Update Type of User
         [HttpPost("{userId}/UpdateType")]
-        public async Task<IActionResult> UpdateUserType(string userId, int userType)
+        public async Task<ActionResult<string>> UpdateUserType(string userId, int userType)
         {
             var result = await _usersServices.UpdateUserType(userId, userType);
-            if (result)
-            {
-                return Ok("User type updated successfully.");
-            }
-            else
-            {
-                return NotFound("User not found.");
-            }
+
+
+            return (result);
         }
         #endregion
 

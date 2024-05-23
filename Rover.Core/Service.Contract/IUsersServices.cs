@@ -11,7 +11,7 @@ namespace Rover.Core.Service.Contract
     public  interface IUsersServices
     {
         Task<bool> InsertUserData(UserDto userData);
-        Task<bool> UpdateUserType(string userId, int userType);
+        Task<string> UpdateUserType(string userId, int userType);
         Task<bool> DeleteUser(string userId);
         Task<bool> UpdateUserData(UserDto userData);
         Task<UserDto> GetUserData(string userId);

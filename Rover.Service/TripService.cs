@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Runtime.ConstrainedExecution;
 
 using System.Runtime.CompilerServices;
+using Rover.Repository.Migrations;
 
 namespace Rover.Service
 {
@@ -65,6 +66,34 @@ namespace Rover.Service
 
             return true;
         }
+
+        #endregion
+
+
+        #region Deleted
+
+        public async Task<bool> DeleteTripAsync(int tripId, string userId)
+        {
+            var trip = await _storeContext.Trips.FirstOrDefaultAsync(t => t.Id == tripId && t.DriverId == userId);
+            if (trip == null)
+            {
+                return false;
+            }
+
+            var deletedTrip = new Deleted_Trips
+            {
+                UserId = userId,
+                TripId = tripId,
+                DeleteDate = DateTime.UtcNow
+            };
+
+            _storeContext.Trips.Remove(trip);
+            _storeContext.DeletedTrips.Add(deletedTrip);
+            await _storeContext.SaveChangesAsync();
+
+            return true;
+        }
+
 
         #endregion
 
@@ -120,11 +149,7 @@ namespace Rover.Service
 
 
 
-
-
-
-
-        #region  Filtration by LastDays
+          #region  Filtration by LastDays
         public IEnumerable<Trip> GetTripsFromLastDays(int days)
         {
             var dateFrom = DateTime.Now.AddDays(-days);
@@ -173,110 +198,122 @@ namespace Rover.Service
 
 
 
-        
-     
 
 
-        #region   Status trip
+        #region  Update  Status trip
         public async Task<string> UpdateTripStatus(string userId, int tripId, int statusId)
         {
+            if (userId == null)
+            {
+                throw new Exception("Invalid user ID");
+            }
+
             var trip = await _genericRepo.GetAsync(tripId);
             var user = await _usersServices.GetUserData(userId);
+
             if (trip == null)
             {
                 throw new Exception("Trip not found");
             }
 
-            if (userId != null)
+            switch (statusId)
             {
-                switch (statusId)
-                {
-                    case 1: // Available
-                        trip.StatusId = 1;
-                        break;
+                case 1: // Available
+                    trip.StatusId = 1;
+                    break;
 
-                    case 2: // Accepted
-
-                        if (user.Type == 1) { // passenger
-
-                            if (trip.SeatsAvaliable > 0)
+                case 2: // Accepted
+                    if (user.Type == 1) // passenger
+                    {
+                        if (trip.SeatsAvaliable > 0)
+                        {
+                            trip.SeatsAvaliable -= 1;
+                            if (trip.SeatsAvaliable == 0)
                             {
-                                trip.SeatsAvaliable -= 1;
-                                if (trip.SeatsAvaliable == 0)
-                                {
-                                    trip.StatusId = 4; // Completed
-                                }
+                                trip.StatusId = 4; // Completed
                             }
-                            var passenger_trip = new Passenger_Trips()
-                            {
-                                TripId = tripId,
-                                PassengerId = userId,
-
-                            };
-
-                            _storeContext.Add<Passenger_Trips>(passenger_trip);
-                            await _storeContext.SaveChangesAsync();
-
-                            
-
                         }
                         else
                         {
-                            return "You Dont Have Permission";  // Driver
+                            return "No available seats";
                         }
 
-
-                        break;
-
-                    case 3: // Cancelled
-                        if (userId == trip.DriverId &&  user.Type != 1)
+                        var passenger_trip = new Passenger_Trips()
                         {
-                            trip.StatusId = 3; // cancle 
-                        }
-                        else {
+                            TripId = tripId,
+                            PassengerId = userId
+                        };
 
+                        _storeContext.Add(passenger_trip);
+                    }
+                    else
+                    {
+                        return "You don't have permission"; // Driver
+                    }
+                    break;
+
+                case 3: // Cancelled
+                    if (userId == trip.DriverId && user.Type != 1) // Driver
+                    {
+                        trip.StatusId = 3; // cancel 
+                    }
+                    else if (userId != trip.DriverId && user.Type == 1) // Passenger
+                    {
+                        var passengerTrip = await _storeContext.Set<Passenger_Trips>()
+                            .FirstOrDefaultAsync(x => x.PassengerId == userId && x.TripId == tripId);
+
+                        if (passengerTrip != null)
+                        {
                             trip.SeatsAvaliable += 1;
-                            if (trip.SeatsAvaliable > 0 && trip.StatusId == 4)
-                            {
-                             
+                            _storeContext.Remove(passengerTrip);
 
-                                var result = _storeContext.Set<Passenger_Trips>().FirstOrDefaultAsync(x => x.PassengerId == userId && x.TripId == tripId);
-                                _storeContext.Remove(result);
-                                await _storeContext.SaveChangesAsync();
+                            if (trip.StatusId == 4)
+                            {
                                 trip.StatusId = 1; // Available
                             }
                         }
+                        else
+                        {
+                            return "This Trip Not Accepted to be Cancel"; //Passenger
+                        }
+                    }
+                    else
+                    {
+                        return "You don't have permission to cancel this trip";  
+                    }
+                    break;
+
+                case 4: // Completed
+                    trip.StatusId = 4;
+                    break;
+                  
+                case 5: // Start
+                    if (userId == trip.DriverId && user.Type != 1)
+                    {
+                        trip.StatusId = 5;
+                        return "The Trip Is Start";
+                    }
+                    break;
+
+                case 6: // End
+                    if (userId == trip.DriverId && user.Type != 1)
+                    {
+                        trip.StatusId = 6;
+                        return "The Trip Is Ended";
+                    }
+                    break;
 
 
-                       
-                        
-                        break;
-
-                    case 4: // Completed
-                        trip.StatusId = 4;
-                        break;
-
-                    default:
-                        throw new Exception("Invalid status ID");
-                }
-
-                await _genericRepo.SaveChangesAsync();
-                return "Trip status updated successfully.";
+                default:
+                    throw new Exception("Invalid status ID");
             }
-            else
-            {
-                throw new Exception("Invalid user ID");
-            }
 
+            await _storeContext.SaveChangesAsync();
+            return "Trip status updated successfully.";
         }
 
-
-
-
-
-     
-
         #endregion
+
 
 
 
@@ -286,19 +323,60 @@ namespace Rover.Service
             var now = DateTime.Now;
             var lowerCaseTerm = searchTerm.ToLower();
 
-            var availableTrips = await _genericRepo.GetAllAsync()
+            var availableTrip = await _genericRepo.GetAllAsync()
+                 .Where(t => t.DeleteDate == null
+                          
+                             && (t.Expected_Arrivale >= now)
+                             &&(t.StatusId== null || t.StatusId ==1)
+                             && (string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
+                          || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
+                          || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
+                          || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm))))
+
+
+
+
+
+
+                 .Select(t => new TripView
+                 {
+                     Id = t.Id,
+                     From = t.From,
+                     To = t.To,
+                     Price = t.Price,
+                     Date = t.Date,
+                     Time = t.Time
+                 })
+                 .ToListAsync();
+            return availableTrip;
+        }
+
+        #endregion
+
+        #region Search by string place and days in History "My tip"
+        public async Task<List<TripView>> SearchHistoricalTripsAsync(string userId, string searchTerm="", int days=0)
+        {
+            var dateFrom = DateTime.Now.AddDays(-days);
+
+            var lowerCaseTerm = searchTerm.ToLower();
+
+            var userTrips = await _genericRepo.GetAllAsync()
                 .Where(t => t.DeleteDate == null
-                            && t.Expected_Arrivale > now
-                            && t.StatusId == 1 // Status 1 for Available
-                            && t.StatusId != 3 // Status 3 for Cancelled
-                            && t.StatusId != 4 // Status 4 for Completed
-                            && (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
-                            || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
-                            || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
-                            || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)))
+                            && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId)) 
+                            &&(days==0 || t.Expected_Arrivale <= dateFrom)
+                            &&(string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
+                         || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
+                         || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
+                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm))))
+
+                            
+
+               
+
+           
                 .Select(t => new TripView
                 {
-                    Id = t.Id,
+                    Id= t.Id,
                     From = t.From,
                     To = t.To,
                     Price = t.Price,
@@ -307,45 +385,12 @@ namespace Rover.Service
                 })
                 .ToListAsync();
 
-            return availableTrips;
+            return userTrips;
         }
 
+       
 
-        #endregion
 
-        #region Search by string place and days in History "My tip"
-        public async Task<List<TripView>> SearchHistoricalTripsAsync(string userId, string searchTerm, int days)
-        {
-            var dateFrom = DateTime.Now.AddDays(-days);
-         
-            var lowerCaseTerm = searchTerm.ToLower();
-
-            var userTrips = await _genericRepo.GetAllAsync()
-                .Where(t => t.DeleteDate == null
-                            && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId)))
-                .ToListAsync();
-
-            var historicalTrips = userTrips
-                .Where(t => t.Expected_Arrivale <= dateFrom
-                            && t.DeleteDate == null)
-                .Where(t => (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
-                         || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
-                         || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
-                         || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm)))
-                .Select(t => new TripView
-                {
-                    From = t.From,
-                    To = t.To,
-                    Price = t.Price,
-                    Date = t.Date,
-                    Time = t.Time // التحقق من أن الخاصية Time من نوع TimeOnly
-                })
-                .ToList();
-
-            return historicalTrips;
-        }
-
-     
 
         #endregion
 

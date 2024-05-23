@@ -29,7 +29,7 @@ namespace Rover.Repository.Data
         public DbSet<Car> Cars { get; set; }
         public DbSet <Passenger_Trips> Passenger_Trips { get; set; }
         public DbSet<TripStatus> Trip_Status { get; set; }
-
+        public DbSet<Deleted_Trips> DeletedTrips { get; set; }
 
 
 

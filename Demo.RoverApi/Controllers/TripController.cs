@@ -18,70 +18,67 @@ namespace Demo.RoverApi.Controllers
         private readonly ITripService _tripService;
         private readonly IGenericRepository<Trip> _genericRepository;
         private readonly IUsersServices _usersServices;
+        private readonly ICarServices _carServices;
 
-        public TripController(ITripService tripService, IGenericRepository<Trip> genericRepository , IUsersServices usersServices)
+        public TripController(ITripService tripService, IGenericRepository<Trip> genericRepository , IUsersServices usersServices , ICarServices carServices)
         {
             _tripService = tripService;
             _genericRepository = genericRepository;
             _usersServices = usersServices;
+            _carServices = carServices;
         }
 
 
         #region  Create Trip
 
-        [HttpPost("creates")] //post: / api/trip
-        public async Task <ActionResult<int>> CreateTrip(TripDto tripDto , string UserId)
 
+        [HttpPost("create")] // POST: /api/trip/create
+        public async Task<ActionResult<int>> CreateTrip(TripDto tripDto)
         {
-            var User = await _usersServices.GetUserId(UserId); // Driver
+            // Assuming user and car validation is done before this point
+            var user = await _usersServices.GetUserData(tripDto.DriverId);
+            var car = await _carServices.GetcarbyCarNumber(tripDto.CarNumber);
 
-            if (UserId == User.User_Id && User.Type == 1)
+            // Check if user exists and has the correct type and if the car belongs to the user
+            if (user == null || user.Type == 1 || car == null || user.UserId != car.UserId)
             {
-
-                return NotFound(new ApiResponse(404, "User dont have Permission"));
-
+                return BadRequest(new ApiResponse(400, "Invalid user or car information"));
             }
 
-            if (User.Type != 1)
+            // Create the trip entity
+            var trip = new Trip
             {
+                From = tripDto.From,
+                To = tripDto.To,
+                Price = tripDto.Price,
+                Date = tripDto.Date,
+                Time = tripDto.Time,
+                SeatsAvaliable = tripDto.SeatsAvaliable,
+                CarNumber = tripDto.CarNumber,
+                Gender = tripDto.Gender,
+                DriverId = tripDto.DriverId,
+                Expected_Arrivale = tripDto.Expected_Arrivale,
+                StatusId = 1
+            };
 
-                Trip trip = new Trip()
-                {
-
-                    To = tripDto.From,
-                    From = tripDto.To,
-                    Price = tripDto.Price,
-                    Date = tripDto.Date,
-                    Time = tripDto.Time,
-                    SeatsAvaliable = tripDto.SeatsAvaliable,
-                    CarNumber = tripDto.CarNumber,
-                    Gender = tripDto.Gender,
-                    DriverId = tripDto.DriverId,
-                    Expected_Arrivale = tripDto.Expected_Arrivale,
-                    StatusId = 1,
-
-
-
-                };
-
-                var tripid = await _tripService.CreateTripAsync(trip);
-
-
-                if (tripid is -1)
-                    return BadRequest(new ApiResponse(400));
-
-
-                return Ok(trip.Id);
+            // Check if the user ID matches the driver ID
+            if (tripDto.DriverId != trip.DriverId)
+            {
+                return BadRequest(new ApiResponse(400, "User does not match the driver"));
             }
 
-           
+            // Create the trip
+            var tripId = await _tripService.CreateTripAsync(trip);
 
+            // Check if the trip creation was successful
+            if (tripId == -1)
+            {
+                return BadRequest(new ApiResponse(400, "Failed to create trip"));
+            }
 
-            return Ok();
-                
-
+            // Return the trip ID
+            return Ok(tripId);
         }
-
         #endregion
 
 
@@ -136,20 +133,23 @@ namespace Demo.RoverApi.Controllers
 
         #region  DeleteTrip
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<string>> DeleteTrip(int id)
+        [HttpDelete("{tripId}")]
+        public async Task<ActionResult> DeleteTrip(int tripId, string userId)
         {
-            var trip = await _genericRepository.GetAsync(id);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required.");
+            }
 
-            if (trip == null)
-                return NotFound(new ApiResponse(404, "Car not found"));
+            var result = await _tripService.DeleteTripAsync(tripId, userId);
 
-            var result = await _tripService.DeleteTripAsync(trip);
+            if (!result)
+            {
+                return NotFound("Trip not found or you do not have permission to delete this trip.");
+            }
 
-
-            return ("Sucsessfully Deleted");
+            return Ok("Trip deleted successfully.");
         }
-
 
         #endregion
 
@@ -330,24 +330,24 @@ namespace Demo.RoverApi.Controllers
 
 
 
-        #region  Search Available Trips
-      
 
-            [HttpGet("Avaliable")]
-            public async Task<IActionResult> SearchAvailableTripsAsync(string searchTerm)
+        #region Search Avaliable Trips
+
+
+        [HttpGet("Avaliable")]
+        public async Task<IActionResult> SearchAvailableTripsAsyncs(string? searchTerm="")
+        {
+            try
             {
-                try
-                {
-                    var trips = await _tripService.SearchAvailableTripsAsync(searchTerm);
-                    return Ok(trips);
-                }
-                catch (Exception ex)
-                {
-                    // Handle exception and return appropriate error response
-                    return StatusCode(500, new ApiResponse(500, ex.Message));
-                }
+                var trips = await _tripService.SearchAvailableTripsAsync(searchTerm);
+                return Ok(trips);
             }
-        
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse(500, ex.Message));
+            }
+        }
+
         #endregion
 
 
@@ -355,31 +355,26 @@ namespace Demo.RoverApi.Controllers
 
 
         [HttpGet("historical")]
-        public async Task<IActionResult> SearchHistoricalTrips(string userId, string searchTerm, int days)
+        public async Task<IActionResult> SearchHistoricalTrips(string userId, string? searchTerm ="", int days = 0)
         {
             try
             {
                 var trips = await _tripService.SearchHistoricalTripsAsync(userId, searchTerm, days);
-                var tripViews = trips.Select(t => new TripView
-                {
-
-                    From = t.From,
-                    To = t.To,
-                    Price = t.Price,
-                    Date = t.Date,
-                    Time = t.Time
-                }).ToList();
-                return Ok(new { success = true, message = "Historical trips retrieved successfully.", data = tripViews });
+             
+                return Ok(new { success = true, message = "Historical trips retrieved successfully.", data = trips });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = $"Failed to retrieve historical trips: {ex.Message}" });
             }
+        
         }
     }
 
     #endregion
 }
+ 
+
 
 
 

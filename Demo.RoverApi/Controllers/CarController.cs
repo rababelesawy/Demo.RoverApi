@@ -6,6 +6,7 @@ using Rover.Core.Service.Contract;
 using ApiRover.Errors;
 using Rover.Core.Interfaces;
 using Rover.Service;
+using Microsoft.EntityFrameworkCore;
 
 namespace Demo.RoverApi.Controllers
 {
@@ -29,9 +30,9 @@ namespace Demo.RoverApi.Controllers
         [HttpPost("CreateCar")]
 
 
-        public async Task<ActionResult<int>> CreateCar(CarDto carDto ,string UserId)
+        public async Task<ActionResult<int>> CreateCar(CarDto carDto )
         {
-            var User = await _usersServices.GetUserData(UserId);
+            var User = await _usersServices.GetUserData(carDto.UserId);
            
 
             if (User == null )
@@ -39,17 +40,8 @@ namespace Demo.RoverApi.Controllers
                 return NotFound(new ApiResponse(404, "User Not Found"));
 
             }
-            if (User != null && User.Type == 1)
-            {
-                return NotFound(new ApiResponse(404, "You don't have permission"));
-
-            }
-
-
-
-
-            if (User.Type != 1)
-            {
+      
+            
 
                 Car car = new Car()
                 {
@@ -66,18 +58,20 @@ namespace Demo.RoverApi.Controllers
                 };
                 var tripid = await _carServices.CreateCarAsync(car);
 
-
+             
                 if (tripid is -1)
                     return BadRequest(new ApiResponse(400));
 
-                return Ok(car.Id);
-            }
+
+                await _usersServices.UpdateUserType(carDto.UserId, 2);
+                await _genericRepository.SaveChangesAsync();
             
+          
 
 
 
-            return Ok();
-       
+            return Ok(car.Id);
+        
         }
 
 
@@ -132,58 +126,39 @@ namespace Demo.RoverApi.Controllers
 
 
 
-        #region  EditCar
+        #region  updateCar
 
         [HttpPut("update")] // PUT: /api/car/update
-        public async Task<ActionResult<string>> UpdateCar(CarDto carDto , string UserId)
+        public async Task<ActionResult<string>> UpdateCar(CarDto carDto)
         {
+            var car = await _carServices.GetCarByIdAsync(carDto.Id);
 
-            var user = await _usersServices.GetUserId(UserId);
-            var car = await _carServices.GetCarByIdAsync (carDto.Id);
-
-            if (user == null)
+            if (car == null)
             {
-                return NotFound(new ApiResponse(404, "User Not Found"));
-
+                return NotFound(new ApiResponse(404, "Car Not Found"));
             }
-            if (user != null && user.Type == 1 && UserId != car.DriverId)
+
+            if (carDto.UserId != car.DriverId)
             {
                 return Unauthorized(new ApiResponse(401, "You don't have permission"));
-
             }
-            if (user != null && user.Type != 1 && user.User_Id == carDto.UserId)
+
+            // Update the existing car entity with the new values from the DTO
+            car.Picture_License = carDto.Picture_License;
+            car.Picture_Car = carDto.Picture_Car;
+            car.Model = carDto.Model;
+            car.Description = carDto.Description;
+            car.License_Car = carDto.License_Car;
+            car.Driver_License_Picture = carDto.Driver_License_Picture;
+
+            var result = await _carServices.UpdateCarAsync(car);
+            if (result == null)
             {
-
-
-                var Car = new Car
-                {
-                    Id = carDto.Id,
-                    Picture_License = carDto.Picture_License,
-                    Picture_Car = carDto.Picture_Car,
-                    Model = carDto.Model,
-                    Description = carDto.Description,
-                    License_Car = carDto.License_Car,
-                    DriverId = carDto.UserId,
-                    Driver_License_Picture = carDto.Driver_License_Picture,
-
-                };
-
-                var result = await _carServices.UpdateCarAsync(Car);
-                if (result is null)
-                {
-                    return ("Faild Update");
-
-
-                }
+                return BadRequest(new ApiResponse(400, "Failed to update car"));
             }
 
-            return ("succsessfull update");
-
-
-
+            return Ok("Successfully updated car");
         }
-
-
 
         #endregion
 

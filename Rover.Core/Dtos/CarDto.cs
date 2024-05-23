@@ -4,22 +4,23 @@ namespace Rover.Core.Dtos
 {
     public class CarDto
     {
-        [Required]
+      
         public int Id { get; set; }
         [Required]
-        public string Picture_License { get; set; }
+        public string? Picture_License { get; set; }
         [Required]
-        public string Picture_Car { get; set; }
+        public string? Picture_Car { get; set; }
         [Required]
-        public long License_Car { get; set; }
+        public long? License_Car { get; set; }
         [Required]
-        public string Model { get; set; }
+        public string? Model { get; set; }
         [Required]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string UserId { get; set; }
+        public string? CarNumber { get; set; }
+        public string? UserId { get; set; }
         [Required]
-        public string Driver_License_Picture { get; set; }
+        public string? Driver_License_Picture { get; set; }
 
         
     }

@@ -26,8 +26,8 @@ namespace Rover.Core.Service.Contract
 
 
         Task<string> UpdateTripStatus(string userId, int tripId, int statusId);
-    
 
+        Task<bool> DeleteTripAsync(int tripid, string userid);
 
     }
 }

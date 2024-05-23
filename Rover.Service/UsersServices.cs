@@ -93,33 +93,34 @@ namespace Rover.Service
         }
         #endregion
 
+   
         #region Update User Type
-        public async Task<bool> UpdateUserType(string userId, int userType)
+        public async Task<string> UpdateUserType(string userId, int userType)
         {
-            try
+            if (string.IsNullOrEmpty(userId))
             {
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new ArgumentException("User ID cannot be empty or null.");
-                }
-
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.User_Id == userId);
-                if (user != null)
-                {
-                    user.Type = userType;
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-                return false; // User not found
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Failed to update user type.", ex);
+                return "User ID cannot be empty or null.";
             }
 
+            if (userType != 1 && userType != 2)
+            {
+                  return "Invalid user type value.";
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.User_Id == userId);
+            if (user == null)
+            {
+                return "user not found"; // User not found
+            }
+
+          
+            // Update user type
+            user.Type = userType;
+            await _context.SaveChangesAsync();
+            return "update sucssessfull";
         }
-
         #endregion
+
 
         #region Delete User
         public async Task<bool> DeleteUser(string userId)

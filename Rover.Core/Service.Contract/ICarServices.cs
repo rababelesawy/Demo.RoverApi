@@ -1,4 +1,5 @@
-﻿using Rover.Core.Entities;
+﻿using Rover.Core.Dtos;
+using Rover.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace Rover.Core.Service.Contract
         Task <string> UpdateCarAsync(Car car);
         Task<bool> DeleteCarAsync(Car car);
         Task<Car> GetCarByIdAsync(int id);
+        Task<CarDto> GetcarbyCarNumber(string carnumber);
     }
 }

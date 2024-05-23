@@ -1,6 +1,9 @@
-﻿using Rover.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Rover.Core.Dtos;
+using Rover.Core.Entities;
 using Rover.Core.Interfaces;
 using Rover.Core.Service.Contract;
+using Rover.Repository.Data;
 using Rover.Repository.GenericRepository;
 using System;
 using System.Collections.Generic;
@@ -14,11 +17,13 @@ namespace Rover.Service
     {
         private readonly IGenericRepository<Car> _carRepo;
         private readonly IUsersServices _usersServices;
+        private readonly StoreContext _context;
 
-        public CarServices(IGenericRepository<Car> CarRepo , IUsersServices usersServices)
+        public CarServices(IGenericRepository<Car> CarRepo , IUsersServices usersServices , StoreContext context)
         {
             _carRepo = CarRepo;
            _usersServices = usersServices;
+            _context = context;
         }
 
 
@@ -65,10 +70,35 @@ namespace Rover.Service
             return true;
         }
 
+        public async Task<CarDto> GetcarbyCarNumber(string carnumber)
+        {
+            try
+            {
 
+                var car = await _context.Cars.FirstOrDefaultAsync(u => u.CarNumber == carnumber);
+                if (car != null)
+                {
+                    return new CarDto()
+                    
+                    {
+                        id = car.Id,
+                       Picture_Car = car.Picture_Car,
+                       License_Car = car.License_Car,
+                        Model=car.Model,
+                        Description = car.Description,
+                        UserId = car.DriverId,
+                        Driver_License_Picture = car.Driver_License_Picture,
+                        CarNumber= car.CarNumber,
+             
 
-
-
-  
+                    };
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }

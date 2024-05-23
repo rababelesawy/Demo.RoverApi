@@ -26,6 +26,7 @@ namespace Rover.Core.Entities
         public ICollection<Passenger_Trips> PassengerTrips { get; set; }
         public ICollection<Trip> Trips { get; set; }
 
+        public ICollection<Deleted_Trips> DeletedTrips { get; set; }
 
     }
 }
