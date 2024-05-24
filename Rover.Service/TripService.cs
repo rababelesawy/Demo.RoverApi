@@ -58,23 +58,13 @@ namespace Rover.Service
 
         #endregion
 
-        #region DeleteTrip
-        public async Task<bool> DeleteTripAsync(Trip trip)
-        {
-            trip.DeleteDate = DateTime.Now;
-            _genericRepo.Delete(trip);
-
-            return true;
-        }
-
-        #endregion
 
 
         #region Deleted
 
         public async Task<bool> DeleteTripAsync(int tripId, string userId)
         {
-            var trip = await _storeContext.Trips.FirstOrDefaultAsync(t => t.Id == tripId && t.DriverId == userId);
+            var trip = await _storeContext.Trips.FirstOrDefaultAsync(t => t.Id == tripId && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId)));
             if (trip == null)
             {
                 return false;
@@ -87,7 +77,7 @@ namespace Rover.Service
                 DeleteDate = DateTime.UtcNow
             };
 
-            _storeContext.Trips.Remove(trip);
+          
             _storeContext.DeletedTrips.Add(deletedTrip);
             await _storeContext.SaveChangesAsync();
 
@@ -318,7 +308,7 @@ namespace Rover.Service
 
 
         #region  AvaliableTrip
-        public async Task<List<TripView>> SearchAvailableTripsAsync(string searchTerm)
+        public async Task<List<TripView>> SearchAvailableTripsAsync(string searchTerm )
         {
             var now = DateTime.Now;
             var lowerCaseTerm = searchTerm.ToLower();
@@ -327,6 +317,7 @@ namespace Rover.Service
                  .Where(t => t.DeleteDate == null
                           
                              && (t.Expected_Arrivale >= now)
+                             
                              &&(t.StatusId== null || t.StatusId ==1)
                              && (string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
                           || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
@@ -363,6 +354,7 @@ namespace Rover.Service
             var userTrips = await _genericRepo.GetAllAsync()
                 .Where(t => t.DeleteDate == null
                             && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId)) 
+                            &&(!t.DeletedTrips.Any(p=>p.UserId==userId))
                             &&(days==0 || t.Expected_Arrivale <= dateFrom)
                             &&(string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
                          || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))

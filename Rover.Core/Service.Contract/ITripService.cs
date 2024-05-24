@@ -13,7 +13,7 @@ namespace Rover.Core.Service.Contract
     {
         Task<int> CreateTripAsync(Trip trip);
         Task<string> UpdateTripAsync(Trip trip);
-        Task<bool> DeleteTripAsync(Trip trip);
+    
         Task<List<TripView>> GetTripListAsync();
         Task<List<TripView>> SearchTripsAsync(string searchTerm);
        // Task<List<TripView>> SearchTripsDaysAsync(string searchTerm, int days);
