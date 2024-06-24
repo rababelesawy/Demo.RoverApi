@@ -123,24 +123,32 @@ namespace Rover.Service
 
 
         #region Delete User
-        public async Task<bool> DeleteUser(string userId)
+        public async Task<string> DeleteUser(string userId, string password)
         {
             try
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.User_Id == userId);
                 if (user != null)
                 {
+                    // Check if password matches (you can adjust this logic based on your password handling)
+                    if (user.Password != password)
+                    {
+                        return "Incorrect password. User deletion failed.";
+                    }
+
                     _context.Users.Remove(user);
                     await _context.SaveChangesAsync();
-                    return true;
+                    return "User deleted successfully.";
                 }
-                return false; // User not found
+                return "User not found."; // User not found
             }
             catch (Exception)
             {
-                return false;
+                // Log the exception or handle as needed
+                throw new Exception("Failed to delete user.");
             }
         }
+
         #endregion
 
         #region Update User Data
@@ -202,6 +210,51 @@ namespace Rover.Service
         }
 
         #endregion
+
+
+        #region Profile
+        public async Task<CarUserDto> GetUserProfileAsync(string userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            var carUserDto = new CarUserDto
+            {
+                UserId = user.User_Id,
+                User_Picture = user.User_Picture,
+                Firstname = user.First_Name,
+                Lastname = user.Last_Name,
+                Email = user.Email,
+                Phone = user.Phone,
+                Gender = user.Gender,
+
+            };
+
+            if (user.Type == 2) // Driver
+            {
+                var car = await _context.Cars.FirstOrDefaultAsync(c => c.DriverId == userId);
+                if (car != null)
+                {
+                    carUserDto.Picture_Car = car.Picture_Car;
+                    carUserDto.CarNumber = car.CarNumber;
+                    
+                }
+            }
+
+            return carUserDto;
+        }
     }
+
+
+
+
+
+
+    #endregion
+
 }
+
     

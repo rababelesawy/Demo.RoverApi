@@ -12,11 +12,11 @@ namespace Rover.Core.Service.Contract
     {
         Task<bool> InsertUserData(UserDto userData);
         Task<string> UpdateUserType(string userId, int userType);
-        Task<bool> DeleteUser(string userId);
+        Task<string> DeleteUser(string userId, string password);
         Task<bool> UpdateUserData(UserDto userData);
         Task<UserDto> GetUserData(string userId);
         Task <User> GetUserId(string userId);
-
+        Task<CarUserDto> GetUserProfileAsync(string userId);
 
     }
 }

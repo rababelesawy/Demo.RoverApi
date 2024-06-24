@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Rover.Core.Dtos;
 using Rover.Core.Entities;
 using Rover.Core.Service.Contract;
+using Rover.Service;
 
 namespace Demo.RoverApi.Controllers
 {
@@ -67,18 +68,32 @@ namespace Demo.RoverApi.Controllers
 
         #region Delete User Data 
         [HttpDelete("{userId}")]
-        public async Task<IActionResult> DeleteUser(string userId)
+        public async Task<IActionResult> DeleteUser(string userId, string password)
         {
-            var result = await _usersServices.DeleteUser(userId);
-            if (result)
+            try
             {
-                return Ok("User deleted successfully.");
+                var resultMessage = await _usersServices.DeleteUser(userId, password);
+
+                if (resultMessage == "User deleted successfully.")
+                {
+                    return Ok(resultMessage);
+                }
+                else if (resultMessage == "User not found.")
+                {
+                    return NotFound(resultMessage);
+                }
+                else
+                {
+                    return BadRequest(resultMessage);
+                }
             }
-            else
+            catch (Exception)
             {
-                return NotFound("User not found.");
+                return BadRequest("An error occurred while Deleting user data.");
             }
+
         }
+
 
         #endregion
 
@@ -102,6 +117,31 @@ namespace Demo.RoverApi.Controllers
 
         #endregion
 
+
+
+        #region Profile 
+
+
+
+
+        [HttpGet("profile/{userId}")]
+        public async Task<IActionResult> GetUserProfile(string userId)
+        {
+            try
+            {
+                var userProfile = await _usersServices.GetUserProfileAsync(userId);
+                return Ok(userProfile);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
+
+
+    #endregion
+
 }
+
  

@@ -22,11 +22,11 @@ namespace Rover.Service
 
     {
         private readonly IGenericRepository<Trip> _genericRepo;
-        
+
         private readonly IUsersServices _usersServices;
         private readonly StoreContext _storeContext;
 
-        public TripService(IGenericRepository<Trip> genericrepo, IUsersServices usersServices , StoreContext storeContext)
+        public TripService(IGenericRepository<Trip> genericrepo, IUsersServices usersServices, StoreContext storeContext)
         {
             _genericRepo = genericrepo;
             _usersServices = usersServices;
@@ -77,7 +77,7 @@ namespace Rover.Service
                 DeleteDate = DateTime.UtcNow
             };
 
-          
+
             _storeContext.DeletedTrips.Add(deletedTrip);
             await _storeContext.SaveChangesAsync();
 
@@ -95,6 +95,7 @@ namespace Rover.Service
 
             return await _genericRepo.GetAllAsync().Where(x => x.DeleteDate == null).Select(x => new TripView()
             {
+                Id = x.Id,
                 From = x.From,
                 To = x.To,
                 Price = x.Price,
@@ -139,7 +140,7 @@ namespace Rover.Service
 
 
 
-          #region  Filtration by LastDays
+        #region  Filtration by LastDays
         public IEnumerable<Trip> GetTripsFromLastDays(int days)
         {
             var dateFrom = DateTime.Now.AddDays(-days);
@@ -155,36 +156,52 @@ namespace Rover.Service
 
 
 
-            #endregion
+        #endregion
 
 
 
-            #region TripDetails
+        #region TripDetails
 
-            public async Task<DetailsTrips> GetTripDetailsAsync(int id)
+        public async Task<DetailsTrips> GetTripDetailsAsync(int id)
         {
-            var trip = await _genericRepo.GetAsync(id);
+            var trip = await _storeContext.Trips
+                .Include(t => t.Driver)
+                .Include(t => t.Car)
+                .Where(t => t.Id == id)
+                .Select(t => new DetailsTrips
+                {
+                    Id = t.Id,
+                    From = t.From,
+                    To = t.To,
+                    Price = t.Price,
+                    Date = t.Date,
+                    Time = t.Time,
+                    Expected_Arrivale = t.Expected_Arrivale,
+                    SeatsAvaliable = t.SeatsAvaliable,
+                    CarNumber = t.CarNumber,
+                    Gender = t.Gender,
+
+                    // Driver details
+                    DriverName = t.Driver != null ? t.Driver.First_Name + " " + t.Driver.Last_Name : null,
+                    DriverPicture = t.Driver != null ? t.Driver.User_Picture : null,
+
+                    // Car details
+                    CarPicture = t.Car != null ? t.Car.Picture_Car : null,
+                    CarLicense = t.Car != null ? t.Car.Picture_License : null,
+                    CarModel = t.Car != null ? t.Car.Model : null
+                })
+                .FirstOrDefaultAsync();
 
             if (trip == null)
             {
-                return null; // or throw an exception, handle as needed
+                return null; 
             }
 
-            return new DetailsTrips
-            {
-                From = trip.From,
-                To = trip.To,
-                Price = trip.Price,
-                Date = trip.Date,
-                Time = trip.Time,
-                Expected_Arrivale = trip.Expected_Arrivale,
-                SeatsAvaliable = trip.SeatsAvaliable,
-                CarNumber = trip.CarNumber,
-                Gender = trip.Gender
-            };
+            return trip;
         }
 
         #endregion
+
 
 
 
@@ -215,6 +232,12 @@ namespace Rover.Service
                 case 2: // Accepted
                     if (user.Type == 1) // passenger
                     {
+                        // Check if trip accepts only males or females
+                        if ((trip.Gender == 1 && user.Gender != 1) || (trip.Gender == 0 && user.Gender != 0))
+                        {
+                            return "This trip is not available for your gender";
+                        }
+
                         if (trip.SeatsAvaliable > 0)
                         {
                             trip.SeatsAvaliable -= 1;
@@ -269,14 +292,14 @@ namespace Rover.Service
                     }
                     else
                     {
-                        return "You don't have permission to cancel this trip";  
+                        return "You don't have permission to cancel this trip";
                     }
                     break;
 
                 case 4: // Completed
                     trip.StatusId = 4;
                     break;
-                  
+
                 case 5: // Start
                     if (userId == trip.DriverId && user.Type != 1)
                     {
@@ -308,17 +331,17 @@ namespace Rover.Service
 
 
         #region  AvaliableTrip
-        public async Task<List<TripView>> SearchAvailableTripsAsync(string searchTerm )
+        public async Task<List<TripDriver>> SearchAvailableTripsAsync(string searchTerm)
         {
             var now = DateTime.Now;
             var lowerCaseTerm = searchTerm.ToLower();
 
             var availableTrip = await _genericRepo.GetAllAsync()
                  .Where(t => t.DeleteDate == null
-                          
+
                              && (t.Expected_Arrivale >= now)
-                             
-                             &&(t.StatusId== null || t.StatusId ==1)
+
+                             && (t.StatusId == null || t.StatusId == 1)
                              && (string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
                           || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
                           || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
@@ -328,15 +351,19 @@ namespace Rover.Service
 
 
 
-
-                 .Select(t => new TripView
+                 .Include(t => t.Driver)
+                 .Select(t => new TripDriver
                  {
                      Id = t.Id,
                      From = t.From,
                      To = t.To,
                      Price = t.Price,
                      Date = t.Date,
-                     Time = t.Time
+                     Time = t.Time,
+                     SeatsAvaliable=t.SeatsAvaliable,
+                     Driver_Name = t.Driver != null ? t.Driver.First_Name + " " + t.Driver.Last_Name : null,
+                     Driver_Picture = t.Driver != null ? t.Driver.User_Picture : null
+
                  })
                  .ToListAsync();
             return availableTrip;
@@ -345,7 +372,7 @@ namespace Rover.Service
         #endregion
 
         #region Search by string place and days in History "My tip"
-        public async Task<List<TripView>> SearchHistoricalTripsAsync(string userId, string searchTerm="", int days=0)
+        public async Task<List<TripView>> SearchHistoricalTripsAsync(string userId, string searchTerm = "", int days = 0)
         {
             var dateFrom = DateTime.Now.AddDays(-days);
 
@@ -353,22 +380,22 @@ namespace Rover.Service
 
             var userTrips = await _genericRepo.GetAllAsync()
                 .Where(t => t.DeleteDate == null
-                            && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId)) 
-                            &&(!t.DeletedTrips.Any(p=>p.UserId==userId))
-                            &&(days==0 || t.Expected_Arrivale <= dateFrom)
-                            &&(string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
+                            && (t.DriverId == userId || t.Passenger_Trips.Any(pt => pt.PassengerId == userId))
+                            && (!t.DeletedTrips.Any(p => p.UserId == userId))
+                            && (days == 0 || t.Expected_Arrivale <= dateFrom)
+                            && (string.IsNullOrEmpty(searchTerm) || (t.From != null && t.From.ToLower().Contains(lowerCaseTerm))
                          || (t.To != null && t.To.ToLower().Contains(lowerCaseTerm))
                          || (t.Price != null && t.Price.ToString().Contains(lowerCaseTerm))
                          || (t.SeatsAvaliable != null && t.SeatsAvaliable.ToString().Contains(lowerCaseTerm))))
 
-                            
 
-               
 
-           
+
+
+
                 .Select(t => new TripView
                 {
-                    Id= t.Id,
+                    Id = t.Id,
                     From = t.From,
                     To = t.To,
                     Price = t.Price,
@@ -380,7 +407,7 @@ namespace Rover.Service
             return userTrips;
         }
 
-       
+
 
 
 

@@ -8,6 +8,7 @@ using System.Reflection;
 using Rover.Core.Interfaces;
 using Rover.Repository.GenericRepository;
 using Rover.Service;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace Demo.RoverApi.Controllers
 {
@@ -158,30 +159,23 @@ namespace Demo.RoverApi.Controllers
 
 
 
-        [HttpGet("Details")]
-        public async Task<ActionResult<DetailsTrips>> GetTripDetails(int id)
+        
+        [HttpGet("details/{id}")]
+        public async Task<IActionResult> GetTripDetails(int id)
         {
-            var trip = await _genericRepository.GetAsync(id);
-
-            if (trip == null)
+            try
             {
-                return NotFound(); // Return 404 if trip with the given ID is not found
+                var tripDetails = await _tripService.GetTripDetailsAsync(id);
+                if (tripDetails == null)
+                {
+                    return NotFound();
+                }
+                return Ok(tripDetails);
             }
-
-            var tripDetails = new DetailsTrips
+            catch (Exception ex)
             {
-                From = trip.From,
-                To = trip.To,
-                Price = trip.Price,
-                Date = trip.Date,
-                Time = trip.Time,
-                Expected_Arrivale = trip.Expected_Arrivale,
-                SeatsAvaliable = trip.SeatsAvaliable,
-                CarNumber = trip.CarNumber,
-                Gender = trip.Gender
-            };
-
-            return Ok(tripDetails);
+                return BadRequest(ex.Message);
+            }
         }
 
         #endregion
@@ -301,10 +295,9 @@ namespace Demo.RoverApi.Controllers
 
         #endregion
 
-
         #region status
 
-     
+
 
         [HttpPost("UpdateTripStatus")]
         public async Task<IActionResult> UpdateTripStatus(string userId, int tripId, int statusId)
@@ -337,9 +330,11 @@ namespace Demo.RoverApi.Controllers
         [HttpGet("Avaliable")]
         public async Task<IActionResult> SearchAvailableTripsAsyncs(string? searchTerm="")
         {
+             
             try
             {
                 var trips = await _tripService.SearchAvailableTripsAsync(searchTerm);
+              
                 return Ok(trips);
             }
             catch (Exception ex)

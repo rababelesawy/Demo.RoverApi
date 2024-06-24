@@ -20,6 +20,7 @@ namespace Rover.Core.Entities
         public DateTime? Expected_Arrivale { get; set; }
         public int? SeatsAvaliable { get; set; }
         public string? CarNumber { get; set; }
+     
         public int? Gender { get; set; }
 
         
