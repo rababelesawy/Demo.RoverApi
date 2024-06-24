@@ -194,7 +194,7 @@ namespace Rover.Service
 
             if (trip == null)
             {
-                return null; 
+                return null;
             }
 
             return trip;
@@ -360,9 +360,9 @@ namespace Rover.Service
                      Price = t.Price,
                      Date = t.Date,
                      Time = t.Time,
-                     SeatsAvaliable=t.SeatsAvaliable,
+                     SeatsAvaliable = t.SeatsAvaliable,
                      Driver_Name = t.Driver != null ? t.Driver.First_Name + " " + t.Driver.Last_Name : null,
-                     Driver_Picture = t.Driver != null ? t.Driver.User_Picture : null
+                     User_Picture = t.Driver != null ? t.Driver.User_Picture : null
 
                  })
                  .ToListAsync();
@@ -393,6 +393,7 @@ namespace Rover.Service
 
 
 
+                 .Include(t => t.Driver)
                 .Select(t => new TripView
                 {
                     Id = t.Id,
@@ -400,13 +401,14 @@ namespace Rover.Service
                     To = t.To,
                     Price = t.Price,
                     Date = t.Date,
-                    Time = t.Time
+                    Time = t.Time,
+                    User_Picture = t.Driver != null ? t.Driver.User_Picture : null
                 })
                 .ToListAsync();
 
             return userTrips;
         }
-
+    }
 
 
 
@@ -422,5 +424,6 @@ namespace Rover.Service
 
 
     }
-}
+
+
 

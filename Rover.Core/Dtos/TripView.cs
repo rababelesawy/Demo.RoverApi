@@ -14,7 +14,7 @@ namespace Rover.Core.Dtos
 
         public DateTime? Date { get; set; }
         public DateTime? Time { get; set; }
-
+        public string? User_Picture { get; set; }
 
 
     }

@@ -23,7 +23,7 @@ namespace Rover.Core.Dtos
     
         public int? SeatsAvaliable { get; set; }
 
-        public string? Driver_Picture { get; set; }
+        public string? User_Picture { get; set; }
     
         public string? Driver_Name { get; set; }
    
